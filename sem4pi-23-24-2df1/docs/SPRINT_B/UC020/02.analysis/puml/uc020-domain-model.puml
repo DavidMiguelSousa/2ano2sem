@@ -1,0 +1,32 @@
+@startuml
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+title Domain Model (DM) - UC020
+
+class CustomerManager <<Root Entity>>
+note left of CustomerManager : conceptual class
+
+class ANTLR <<Service>>
+note right of ANTLR : external service
+
+package InterviewAggregate {
+    class Interview <<Root Entity>>
+}
+
+package InterviewModelAggregate {
+    class InterviewModel <<Root Entity>>
+}
+
+CustomerManager "1" --- "*" Interview : manages >
+Interview "1" --- "1" InterviewModel : follows >
+ANTLR "1" --- "*" InterviewModel : parses >
+
+@enduml

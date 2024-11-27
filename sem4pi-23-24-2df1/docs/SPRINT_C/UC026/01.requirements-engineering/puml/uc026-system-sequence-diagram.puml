@@ -1,0 +1,63 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC026
+actor CustomerManager as CM
+participant ":System" as System
+
+activate CM
+
+        CM -> System: Login
+    activate System
+
+        System -> System: Validate login
+
+        System --> CM: Allow access to the backoffice \napplication with Customer Manager permissions
+    deactivate System
+
+        CM -> System: Select the option to close the job opening
+    activate System
+
+        System --> CM: Display job opening that has phases
+    deactivate System
+
+
+        CM -> System: Select the job opening to be open
+
+    activate System
+
+        System -> CM: Display job opening phases
+
+        loop for each phase
+            CM -> System: Select the phase to be open
+
+            System -> System: Validate the phase to be open
+
+            System --> CM: Allow the phase to be open
+
+    deactivate System
+
+        end loop
+
+        CM -> System: Confirm the job opening to be open
+    activate System
+
+        alt Phases is enabled
+            System --> CM: Phases of the process for a job opening enabled successfully
+        else Phases is not enabled
+            System --> CM: Phases of the process for a job opening not enabled successfully
+        end
+
+    alt if allPhases = Status.COMPLETED
+
+        System --> CM: Job opening completed successfully
+
+    end
+
+    deactivate System
+
+deactivate CM
+
+@enduml

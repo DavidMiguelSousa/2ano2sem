@@ -1,0 +1,83 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+left to right direction
+
+title Domain Model (DM) - UC015
+
+class SystemUserBuilder <<factory>>
+
+package SystemUserAggregate {
+
+    class EmailAddress <<value>>
+
+    class SystemUser <<root>>
+
+    class Password <<value>>
+
+    class Name <<value>>
+
+    class RoleSet <<value>>
+
+    class RoleAssignment <<entity>>
+
+    class Role <<value>>
+
+    class Set<RoleAssignment> <<value>>
+
+}
+
+package CustomerManagerAggregate {
+    class CustomerManager <<Root Entity>>
+}
+
+
+package JobOpeningAggregate {
+    class JobOpening <<Root Entity>>
+    class JobReference <<Value Object>>
+    class JobOpeningProcess <<Value Object>>
+    enum JobOpeningPhase <<Value Object>> {
+        APPLICATION
+        SCREENING
+        INTERVIEWS
+        ANALYSIS
+        RESULT
+    }
+    class JobOpeningPhaseInitialDate <<Value Object>>
+    class JobOpeningPhaseFinalDate <<Value Object>>
+}
+
+class PasswordPolicy <<service>>
+
+class PasswordEncoder <<service>>
+
+SystemUserBuilder ..> SystemUser
+
+SystemUser --> Name
+SystemUser --> Password
+SystemUser --> EmailAddress
+SystemUser <--- CustomerManager
+SystemUser -left-> RoleSet
+
+RoleSet ..|> Set
+RoleSet .down.> RoleAssignment
+Role <-down- RoleAssignment
+
+Password ..> PasswordPolicy
+Password ..> PasswordEncoder
+
+CustomerManager "1" -- "*" JobOpening
+
+JobOpening "1" -- "1" JobReference
+JobOpening "1" -- "1" JobOpeningProcess
+JobOpeningProcess -- JobOpeningPhase
+JobOpeningPhase -- JobOpeningPhaseInitialDate
+JobOpeningPhase -- JobOpeningPhaseFinalDate
+
+@enduml

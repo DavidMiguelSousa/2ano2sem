@@ -1,0 +1,46 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+title Domain Model (DM) - UC024
+
+package SystemUserAggregate {
+    class EmailAddress <<value>> <<id>>
+
+    class SystemUser <<root>> {
+        - active : Boolean
+        - deactivatedOn : Calendar
+    }
+
+    class Name <<value>>
+
+    class RoleSet <<value>>
+
+    class RoleAssignment <<entity>>
+
+    class Role <<value>>
+
+    class RoleSet <<value>>
+
+    class Set<RoleAssignment> <<value>>
+}
+
+package CandidateAggregate {
+    class Candidate <<root>>
+}
+
+SystemUser --> Name
+SystemUser --> EmailAddress
+SystemUser --left-> RoleSet
+RoleSet ..|> Set
+RoleSet .down.> RoleAssignment
+Role <-up- RoleAssignment
+
+Candidate --> SystemUser: is a
+
+@enduml

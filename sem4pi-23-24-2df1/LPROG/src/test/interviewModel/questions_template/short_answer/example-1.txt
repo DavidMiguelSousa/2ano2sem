@@ -1,0 +1,4 @@
+INTERVIEW "Short-answer example-1"
+
+SAQUES [Text] "What's the first month of the year?" [10];
+SOL <January|1>;

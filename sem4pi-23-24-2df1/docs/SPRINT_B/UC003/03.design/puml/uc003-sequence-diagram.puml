@@ -1,0 +1,98 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC003
+
+actor Admin as Actor
+participant DeactiveUserUI as UI <<presentation>>
+participant DeactiveUserController as Controller <<application>>
+participant PersistenceContext as Persistence <<persistence>>
+participant RepositoryFactory as Factory <<factory>>
+database SystemUserRepository as Repository <<repository>>
+participant UserManagementService as Service <<service>>
+participant "systemUser:SystemUser" as Domain <<domain>>
+
+Actor --> UI: Deactivate User
+activate UI
+    UI -> Controller: activeUsers()
+    activate Controller
+
+        Controller -> Persistence: repositories()
+        activate Persistence
+            note right of Persistence: creates in JPA
+            Persistence -> Factory: create
+            Persistence --> Controller: factory
+        deactivate Persistence
+
+        Controller -> Factory: users()
+        activate Factory
+            Factory -> Repository: create
+            Factory --> Controller: userRepository
+        deactivate Factory
+
+        Controller -> Service: activeUsers()
+        activate Service
+
+            Service -> Repository: activeUsers()
+            activate Repository
+
+                Repository --> Service: users
+            deactivate Repository
+
+            loop for all users
+                Service -> Domain: name()
+                Service -> Domain: email()
+                activate Domain
+
+                    Domain --> Service: user's details
+                deactivate Domain
+            end loop
+
+            Service --> Controller: users with respective details
+        deactivate Service
+
+        Controller --> UI: users
+    deactivate Controller
+
+    UI --> Actor: display users
+
+    Actor -> UI: select user to deactivate
+
+    UI -> Controller: deactivateUser(user)
+    activate Controller
+
+        Controller -> Repository: find()
+        activate Repository
+
+            Repository --> Controller: user
+        deactivate Repository
+
+        Controller -> Service: deactivateUser(user)
+        activate Service
+
+            Service -> Domain: deactivate()
+            activate Domain
+
+                Domain --> Service: user
+            deactivate Domain
+
+            Service -> Repository: save()
+            activate Repository
+
+                Repository --> Service: user
+            deactivate Repository
+
+            Service --> Controller: user
+        deactivate Service
+
+        Controller --> UI: user
+    deactivate Controller
+
+    UI --> Actor: user disabled
+deactivate UI
+
+@enduml

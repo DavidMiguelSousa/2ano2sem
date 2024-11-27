@@ -1,0 +1,200 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC001
+
+actor CustomerManager as CM
+participant UploadTextInterviewModelUI as UI <<presentation>>
+participant UploadTextInterviewModelController as Controller <<application>>
+participant ": JobOpeningManagementService" as JobOpeningService  <<service>>
+participant ": AuthorizationService" as AuthService <<service>>
+participant ": JobApplicationManagementService" as JobApplicationService <<service>>
+participant ": InterviewManagementService" as InterviewService <<service>>
+
+database JobOpeningRepository as JobOpeningRepository <<repository>>
+database JobApplicatitonRepository as JobApplicatitonRepository <<repository>>
+database InterviewModelRepository as InterviewModelRepository <<repository>>
+
+activate CM
+
+    CM --> UI: Select the import file with response candidate
+    activate UI
+
+
+    UI -> Controller: create()
+
+       activate Controller
+
+            UI -> Controller : allJobOpening()
+
+
+                Controller -> JobOpeningService : findAllAvailable()
+
+           activate JobOpeningService
+
+                  JobOpeningService -> AuthService : ensureAuthenticatedUserHasAnyOf()
+
+                    activate AuthService
+
+                        AuthService --> JobOpeningService : (in)success authentication
+
+                    deactivate AuthService
+
+                  JobOpeningService -> JobOpeningRepository : findAll()
+
+                    activate JobOpeningRepository
+
+                        JobOpeningRepository --> JobOpeningService : jobOpenings
+
+                    deactivate JobOpeningRepository
+
+                  JobOpeningService --> Controller : jobOpenings
+
+           deactivate JobOpeningService
+
+            Controller --> UI : jobOpenings
+
+       deactivate Controller
+
+       UI --> CM : list of job openings
+
+    deactivate UI
+
+       CM -> UI : Select a jobOpening
+
+         activate UI
+
+                UI -> Controller : allJobApplicationsByJobOpening(selectedJobOpening)
+
+                 activate Controller
+
+                      Controller -> JobApplicationService : jobApplicationOf(jobOpening)
+
+                            activate JobApplicationService
+
+                                JobApplicationService -> JobApplicatitonRepository : findJobApplicationsByJobOpening(jobOpening)
+
+                                    activate JobApplicatitonRepository
+
+                                        JobApplicatitonRepository --> JobApplicationService : jobApplications
+
+                                    deactivate JobApplicatitonRepository
+
+                                JobApplicationService --> Controller : jobApplications
+
+                            deactivate JobApplicationService
+
+                      Controller --> UI : jobApplications
+
+                 deactivate Controller
+
+                UI --> CM : list of job applications
+
+            deactivate UI
+
+            CM -> UI : Select a jobApplication
+            note right of CM
+                Export automatically the text interview
+            end note
+
+            activate UI
+
+                UI -> Controller : searchInterviewModels(fileName)
+
+                    activate Controller
+
+                        Controller -> InterviewService : searchInterviewModels()
+
+                            activate InterviewService
+
+                                InterviewService -> InterviewService : fullPath.toString()
+
+
+                                InterviewService --> Controller : fullPath.toString()
+
+                            deactivate InterviewService
+
+                        Controller --> UI : fullPath.toString()
+
+                    deactivate Controller
+
+                            UI -> Controller: exportTextInterview(filePath, nameFile)
+
+                                activate Controller
+
+                                    Controller -> InterviewService : exportTextInterview(filePath, nameFile)
+
+                                        activate InterviewService
+
+                                            InterviewService -> InterviewService : Files.copy(sourcePath. destinationPath. StandardCopyOption.REPLACE_EXISTING)
+
+                                            InterviewService --> Controller : file (not)exported to downloads successfully
+
+                                        deactivate InterviewService
+
+                                    Controller --> UI : file (not)exported to downloads successfully
+
+                                deactivate Controller
+
+                                UI --> CM : file (not)exported to downloads successfully
+
+                                alt if file exported successfully
+
+                                    UI -> CM : File exported successfully and Display if you want to import the file.
+
+                                    deactivate UI
+
+                                    alt if answer="Yes"
+
+                                    CM -> UI : Enter the file path to import
+
+                                    activate UI
+
+                                        UI -> Controller : importTextInterview(filePath, destinationPath, nameFile)
+
+                                        activate Controller
+
+                                            Controller -> InterviewService : importTextInterview(downloadsPath, destinationPath, nameFile)
+
+                                            activate InterviewService
+
+                                                InterviewService -> InterviewService : copyFile(destination, pathdownloadsPath, nameFile, newFileName)
+
+                                                InterviewService -> InterviewService : Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING)
+
+
+                                                InterviewService --> Controller : file (not)imported to path SCOMP successfully
+
+                                            deactivate InterviewService
+
+                                            Controller --> UI : file (not)imported to path SCOMP successfully
+
+                                        deactivate Controller
+
+                                        UI --> CM : file imported
+
+
+                                    else if answer="No"
+
+                                        UI --> CM : File not imported
+
+                                    end
+
+                                else if file not exported successfully
+
+                                    UI --> CM : File not exported successfully
+
+                                end
+
+                        deactivate CM
+
+                    deactivate CM
+
+            deactivate UI
+deactivate CM
+
+@enduml

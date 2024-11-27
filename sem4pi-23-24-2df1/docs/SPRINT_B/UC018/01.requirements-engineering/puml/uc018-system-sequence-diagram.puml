@@ -1,0 +1,38 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC018
+actor CustomerManager as CM
+
+activate CM
+
+    CM -> ":System" : choosing the job Requirements for a job opening.
+
+    activate ":System"
+        ":System" --> CM : list with job openings to select from
+    deactivate ":System"
+
+    CM -> ":System" : enter the job opening reference number
+
+    alt successful case
+        activate ":System"
+            ":System" --> CM : list with job requirements to select from
+
+        deactivate ":System"
+            CM -> ":System" : select the job requirement
+
+        activate ":System"
+            ":System" --> CM : the job requirements was successfully selected
+
+        deactivate ":System"
+
+    else insucessful case
+        ":System" --> CM : the job opening reference number is invalid
+        deactivate ":System"
+    end
+
+deactivate CM
+
+@enduml

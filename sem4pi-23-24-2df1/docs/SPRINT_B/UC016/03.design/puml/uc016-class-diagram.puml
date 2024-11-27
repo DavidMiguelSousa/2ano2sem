@@ -1,0 +1,46 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC016
+
+class SetupJobOpeningPhasesUI <<interface>>
+
+class SetupJobOpeningPhasesController <<controller>>
+
+class JobOpeningManagementService <<service>>
+
+class JobOpeningRepository <<repository>>
+
+class RepositoryFactory <<factory>>
+
+class JobOpeningBuilder <<builder>>
+
+class JobOpening <<entity>>
+
+class JobOpeningPhases <<value>>
+
+enum Phases <<value>>
+
+class Calendar <<value>>
+
+SetupJobOpeningPhasesUI ..> SetupJobOpeningPhasesController
+
+SetupJobOpeningPhasesController ..> JobOpeningManagementService : uses >
+SetupJobOpeningPhasesController ..> JobOpeningRepository : accesses >
+
+JobOpeningManagementService ..> JobOpeningBuilder : uses
+
+RepositoryFactory .up.> JobOpeningRepository
+
+JobOpeningRepository ..> JobOpening : saves in database >
+
+JobOpeningBuilder ..> JobOpening : updates >
+
+JobOpening ..> JobOpeningPhases : creates >
+
+JobOpeningPhases -up-> Phases
+JobOpeningPhases -up-> Calendar
+@enduml

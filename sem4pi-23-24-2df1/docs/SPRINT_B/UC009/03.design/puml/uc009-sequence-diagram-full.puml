@@ -1,0 +1,78 @@
+@startuml
+
+actor Operator as Operator
+
+participant ListCandidatesUI as ui <<presentation>>
+participant ListCandidatesController as controller <<application>>
+participant AuthenticationService as authz <<service>>
+participant UserSession as session <<session>>
+participant UserManagementService as service <<service>>
+participant PersistenceContext as context <<persistence>>
+participant RepositoryFactory as factory <<factory>>
+database UserRepository as repository <<repository>>
+
+    Operator --> ui: List all candidates
+    activate ui
+
+    ui -> controller: create()
+
+    ui -> controller: listCandidates()
+    activate controller
+
+    controller -> authz: create()
+
+    controller -> authz: ensureAuthenticatedUserHasAnyOf(BaseRoles.OPERATOR)
+    activate authz
+
+    authz -> session: create()
+
+    controller -> authz : session()
+
+    authz -> controller : session
+    deactivate authz
+
+    controller -> session : authenticatedUser()
+    activate session
+
+    session -> controller : user
+    deactivate session
+
+    controller -> service: create()
+
+    controller -> service: allUsers()
+    activate service
+
+    service -> context : repositories()
+    activate context
+
+    context -> factory : create()
+
+    context -> service : factory
+    deactivate context
+
+    service -> factory : users()
+
+    activate factory
+
+    factory -> repository : create()
+
+    factory -> service : userRepository
+    deactivate factory
+
+    service -> repository : listCandidates = findAll()
+    activate repository
+
+    repository --> service : listCandidates
+
+    deactivate repository
+    service --> controller : listCandidates
+
+    deactivate service
+    controller --> ui : listCandidates
+
+    deactivate controller
+
+    ui --> Operator : Display all candidates
+    deactivate ui
+
+@enduml

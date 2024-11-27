@@ -1,0 +1,10 @@
+JOB REQUIREMENTS "JavaProgrammer"
+
+MININT "Enter the number of years of experience (integer).";
+Answer: 5
+
+MINORD  "Select one degree (None; Bachelor; Master; PhD)";
+Answer: Master
+
+MULORSING "Select one or more programming languages you're proficient in (java; javascript; python)";
+Answer: java,javascript

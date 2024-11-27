@@ -1,0 +1,149 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC034
+
+actor CustomerManager as CM
+participant ResultCandidatesNotificationUI as UI <<presentation>>
+participant ResultCandidatesNotificationController as Controller <<application>>
+participant JobOpeningManagementService as Service <<service>>
+database JobOpeningRepository as Repository <<repository>>
+database JobApplicationRepository as JobApplicationRepository <<repository>>
+
+
+activate CM
+
+CM -> UI: Send Email
+
+activate UI
+
+    UI -> Controller: create()
+
+    UI -> Controller: allJobOpening()
+
+    activate Controller
+
+        Controller -> Service: findAllAvailable()
+
+        activate Service
+
+            Service -> Repository : findAll()
+
+            activate Repository
+
+                Repository --> Service : jobOpening
+
+
+            deactivate Repository
+
+            Service --> Controller : jobOpening
+
+        deactivate Service
+
+   deactivate Controller
+
+        Controller --> UI : jobOpening
+
+        UI -> Controller: jobApplicationsOf()
+
+        activate Controller
+
+            Controller -> Service: jobApplicationsOf()
+
+            activate Service
+
+                Service -> JobApplicationRepository: applicationsByJobOpening()
+
+                activate JobApplicationRepository
+
+                    JobApplicationRepository --> Service: jobApplications
+
+                deactivate JobApplicationRepository
+
+
+                Service --> Controller: jobApplications
+
+            deactivate Service
+
+            Controller --> UI: jobApplications
+
+            deactivate Controller
+
+        loop jobApplication in jobApplication
+
+        UI -> Controller: iscandidateAcceptedForJobOpening()
+
+        activate Controller
+
+            Controller -> Service: iscandidateAcceptedForJobOpening()
+
+            activate Service
+
+                Service --> JobApplicationRepository : applicationsByCandidate()
+
+                activate JobApplicationRepository
+
+                    JobApplicationRepository --> Service : jobApplications
+
+                deactivate JobApplicationRepository
+
+
+                    Service --> Service : return candidate with RankStatus=RANKED
+                    activate Service
+
+                        Service --> Controller : return candidate with RankStatus=RANKED
+
+                    deactivate Service
+
+            deactivate Service
+
+            Controller --> UI : return candidate with RankStatus=RANKED
+
+        deactivate Controller
+
+            UI -> Controller: sendEmail()
+
+            activate Controller
+
+             Controller -> Service : sendEmail()
+            activate Service
+
+                Service --> Service : sendNotification()
+
+                activate Service
+
+
+                alt if send email with success
+
+                    Service -> Repository : save(jobOpening)
+                deactivate Service
+
+                    activate Repository
+
+                        Repository --> Service :  Job opening successfully saved in the repository
+
+                    deactivate Repository
+
+                Service --> Controller : Email successfully sent and notification record saved
+
+            deactivate Service
+
+            Controller --> UI : Email successfully sent and notification record saved
+
+        else
+
+            Controller --> UI : Email not sent and notification record not saved
+
+         deactivate Controller
+          end loop
+
+        UI --> CM: Email successfully sent and notification record saved
+
+deactivate UI
+
+deactivate CM
+@enduml

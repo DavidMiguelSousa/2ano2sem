@@ -1,0 +1,131 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing true
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC023
+
+actor "Customer Manager" as Actor
+participant EditJobOpeningUI as UI <<presentation>>
+participant EditJobOpeningController as Controller <<application>>
+participant AuthorizationService as Authz <<service>>
+participant UserSession as Session <<Session>>
+participant JobOpeningManagementService as Service <<service>>
+participant "jobOpening:JobOpening" as Domain <<domain>>
+participant PersistenceContext as Persistence <<persistence>>
+participant RepositoryFactory as Factory <<factory>>
+database JobOpeningRepository as Repository <<repository>>
+
+Actor -> UI: Edit Job Opening
+activate UI
+
+    UI -> Controller: create()
+
+    UI -> Controller: jobOpenings()
+    activate Controller
+
+    Controller -> Authz: create()
+
+    Controller -> Authz: ensureAuthenticatedUserHasAnyOf(BaseRoles.CUSTOMER_MANAGER)
+    activate Authz
+
+    Authz -> Session: create()
+
+    Controller -> Authz : session()
+
+    Authz -> Controller : session
+    deactivate Authz
+
+    Controller -> Session : authenticatedUser()
+    activate Session
+
+    Session -> Controller : user
+    deactivate Session
+
+    Controller -> Service: create()
+
+    Controller -> Service: findAll()
+    activate Service
+
+    Service -> Persistence: repositories()
+    activate Persistence
+
+    Persistence -> Factory: create()
+
+    Persistence -> Service: factory
+    deactivate Persistence
+
+    Service -> Factory: jobOpenings()
+    activate Factory
+
+    Factory -> Repository: create()
+
+    Factory -> Service: jobOpeningRepository
+    deactivate Factory
+
+    Service -> Repository: findAllActive()
+    activate Repository
+
+    Repository -> Service: jobOpenings
+    deactivate Repository
+
+    Service -> Controller: jobOpenings
+    deactivate Service
+
+    Controller -> UI: jobOpenings
+    deactivate Controller
+
+    UI -> Actor: Show Job Opening list
+
+    Actor -> UI: Select Job Opening
+
+loop
+    UI -> Actor: Ask to select which section to edit
+
+    Actor -> UI: Selects
+
+    UI -> Actor: Ask for data
+
+    Actor -> UI: Inputs data
+
+        alt Job Title
+        UI -> Controller: changeJobTitleTo()
+        activate Controller
+
+        Controller -> Domain: updateJobTitle()
+        else Contract Type
+        UI -> Controller: changeContractTypeTo()
+
+        Controller -> Domain: updateContractType()
+        else Job Mode
+        UI -> Controller: changeJobModeTo()
+
+        Controller -> Domain: updateJobMode()
+        else Job Description
+        UI -> Controller: changeJobDescriptionTo()
+
+        Controller -> Domain: updateJobDescription()
+        else Address
+        UI -> Controller: changeAddressTo()
+
+        Controller -> Domain: updateAddress()
+        else Number of Vacancies
+        UI -> Controller: changeNumberOfVacanciesTo()
+
+        Controller -> Domain: updateNumberOfVacancies()
+
+        end alt
+
+        Controller -> Repository: save(theJobOpening)
+
+        Controller -> UI: theJobOpening
+        deactivate Controller
+
+        UI -> Actor: Ask if user wants to edit more sections
+end loop
+
+        UI -> Actor: (un)success of the operation
+
+@enduml

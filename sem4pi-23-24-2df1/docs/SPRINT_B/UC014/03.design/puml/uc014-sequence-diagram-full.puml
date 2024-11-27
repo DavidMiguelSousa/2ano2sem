@@ -1,0 +1,61 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC014
+'hide footbox
+actor "CustomerManager" as CM
+participant ": ListPersonalDataCandidateUI" as ListPersonalDataCandidateUI <<presentation>>
+participant ": ListUsersController" as Controller <<application>>
+participant ": AuthorizationService" as AuthorizationService <<service>>
+participant ": UserManagementService" as UserManagementService <<service>>
+
+database DomainRepository as UserRepository <<repository>>
+
+activate CM
+
+CM -> ListPersonalDataCandidateUI : want to display personal data of a candidate
+
+    activate ListPersonalDataCandidateUI
+
+        ListPersonalDataCandidateUI --> CM : request for username
+
+    deactivate ListPersonalDataCandidateUI
+
+        CM -> ListPersonalDataCandidateUI : send username
+
+        activate ListPersonalDataCandidateUI
+
+        ListPersonalDataCandidateUI -> Controller : selectUserCandidate(email)
+            activate Controller
+
+                Controller -> AuthorizationService : ensureAuthenticatedUserHasAnyOf(roles)
+                activate AuthorizationService
+
+                    AuthorizationService -> UserManagementService : userOfIdentity(username)
+                    activate UserManagementService
+
+                        UserManagementService -> UserRepository : ofIdentity(identity)
+                        activate UserRepository
+
+                            UserRepository -> UserRepository : select()
+
+                            UserRepository --> UserManagementService : candidate
+                        deactivate UserRepository
+
+                        UserManagementService --> AuthorizationService : candidate
+                    deactivate UserManagementService
+
+                    AuthorizationService --> Controller : candidate
+                deactivate AuthorizationService
+
+                Controller --> ListPersonalDataCandidateUI : candidate
+            deactivate Controller
+
+        ListPersonalDataCandidateUI --> CM : display personal data of a candidate
+    deactivate ListPersonalDataCandidateUI
+deactivate CM
+@enduml

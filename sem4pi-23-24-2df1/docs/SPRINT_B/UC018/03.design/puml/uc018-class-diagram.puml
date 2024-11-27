@@ -1,0 +1,43 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC018
+
+class SelectJobRequirementsUI <<interface>>
+
+class SelectJobRequirementsController <<controller>>
+
+class JobOpeningManagementService <<service>>
+
+class ListJobRequirementsService <<service>>
+
+class JobRequirementsRepository <<repository>>
+
+class JobOpeningRepository <<repository>>
+
+class RepositoryFactory <<factory>>
+
+class JobOpening <<entity>>
+
+class JobRequirements <<entity>>
+
+SelectJobRequirementsUI ..> SelectJobRequirementsController
+
+SelectJobRequirementsController ..> JobOpeningManagementService : uses >
+SelectJobRequirementsController ..> ListJobRequirementsService : uses >
+
+SelectJobRequirementsController ..> JobRequirementsRepository : accesses >
+SelectJobRequirementsController ..> JobOpeningRepository : accesses >
+
+RepositoryFactory .up.> JobRequirementsRepository
+RepositoryFactory .up.> JobOpeningRepository
+
+JobOpeningRepository ..> JobOpening : saves in database >
+
+JobRequirementsRepository ..> JobRequirements : saves in database >
+
+
+@enduml

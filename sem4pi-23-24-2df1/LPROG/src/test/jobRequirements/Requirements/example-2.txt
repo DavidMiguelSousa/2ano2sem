@@ -1,0 +1,10 @@
+JOB REQUIREMENTS "Example 2"
+
+MININT "Indicate required years of management experience (integer; range)" ;
+Requirement: 8;
+
+MINORD "Specify educational background (High School; Associate's; Bachelor's; Master's; Doctorate)";
+Requirement: Master's;
+
+MULORSING "List competencies in project management tools (Trello; Asana; Jira)";
+Requirement: Trello,Jira;

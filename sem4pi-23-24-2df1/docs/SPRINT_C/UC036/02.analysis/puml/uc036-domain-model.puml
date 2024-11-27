@@ -1,0 +1,49 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+title Domain Model (DM) - UC036
+
+package JobApplicationAggregate {
+    class JobApplication <<Root Entity>>
+    class JobApplicationReference <<Value Object>>
+    enum JobApplicationStatus <<Value Object>> {
+        PENDING
+        APPROVED
+        REJECTED
+    }
+    class CurriculumVitae <<Value Object>>
+    class PhoneNumber <<Value Object>>
+    class JobApplicationEmail <<Value Object>>
+    class JobApplicationBigFile <<Value Object>>
+    class JobApplicationAdditionalData <<Value Object>>
+    package InterviewPackage {
+        class Interview <<Value Object>>
+        class InterviewTimestamp <<Value Object>>
+        class InterviewName <<Value Object>>
+        class InterviewDescription <<Value Object>>
+        class InterviewGrade <<Value Object>>
+    }
+
+}
+
+JobApplication "1" -- "1" JobApplicationReference : identified by >
+JobApplication "1" -- "1" JobApplicationStatus : with >
+JobApplication "1" -- "1" CurriculumVitae : of <
+JobApplication "1" -- "1" PhoneNumber : with >
+JobApplication "1" ---- "0..1" Interview : has >
+JobApplication "1" -- "1" JobApplicationEmail : with >
+JobApplication "1" -- "1" JobApplicationBigFile : with >
+JobApplication "1" -- "1" JobApplicationAdditionalData : with >
+
+Interview "1" -- "1" InterviewTimestamp : on >
+Interview "1" -- "1" InterviewName : identified by >
+Interview "1" -- "1" InterviewDescription : with >
+Interview "1" -- "1" InterviewGrade : with >
+
+@enduml

@@ -1,0 +1,4 @@
+INTERVIEW "True False example-2"
+
+TFQUES [TRUE|FALSE] "HTML isn't a programming language." [10];
+SOL <TRUE|1>;

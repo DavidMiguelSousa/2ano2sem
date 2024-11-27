@@ -1,0 +1,37 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC003
+actor Admin as Admin
+participant ":System" as System
+
+activate Admin
+    Admin -> System: Login
+    activate System
+
+        System -> System: Validate login
+
+        System --> Admin: Allow access to the backoffice application with admin permissions
+    deactivate System
+
+    Admin -> System: Select the option to disable the user
+    activate System
+
+        System --> Admin: Display all active system users
+    deactivate System
+
+    Admin -> System: Select the user to be disabled
+    activate System
+
+        System -> System: Disable user
+        alt User is disabled
+            System --> Admin: User disabled successfully
+        else User is not disabled
+            System --> Admin: User not disabled
+        end
+    deactivate System
+deactivate Admin
+
+@enduml

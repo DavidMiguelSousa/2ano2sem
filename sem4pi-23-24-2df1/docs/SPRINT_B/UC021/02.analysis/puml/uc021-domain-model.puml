@@ -1,0 +1,30 @@
+@startuml
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+class Operator<<Root Entity>>
+note left of Operator: conceptual class
+
+class ANTLR <<Service>>
+note right of ANTLR : external service
+
+package JobOpeningAggregate {
+    class JobOpening <<Root Entity>>
+}
+
+package JobRequirementsAggregate {
+    class JobRequirements <<Root Entity>>
+}
+
+Operator "1" --- "*" JobOpening : manages >
+JobOpening "1" --- "1" JobRequirements : follows >
+ANTLR "1" --- "*" JobRequirements : parses >
+
+@enduml

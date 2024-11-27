@@ -1,0 +1,76 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC015
+'hide footbox
+actor "CustomerManager" as CM
+participant ": ListDetailsApplicationCandidateUI" as ListPersonalDataCandidateUI <<presentation>>
+participant ": ApplicationControler" as Controller <<application>>
+participant ": ApplicationService" as ApplicationService  <<service>>
+
+database ApplicationRepository as ApplicationRepository <<repository>>
+database JobOpeningRepository as JobOpeningRepository <<repository>>
+
+    ref over CM
+
+    UC014
+
+    end ref
+
+    activate CM
+
+        CM -> ListPersonalDataCandidateUI : want to display details candidates with application list
+
+        activate ListPersonalDataCandidateUI
+
+            ListPersonalDataCandidateUI -> Controller  : displayApplicationsByCandidateId(username)
+
+                activate Controller
+
+                Controller -> ApplicationService : findApplicationsByCandidateId(username)
+                    activate ApplicationService
+
+                            ApplicationService -> JobOpeningRepository : findApplicationsByCandidateId(username)
+                        activate JobOpeningRepository
+
+                                JobOpeningRepository --> JobOpeningRepository : select(jobReference, status)
+                                JobOpeningRepository --> ApplicationService : jobReference, status
+                        deactivate JobOpeningRepository
+
+                            ApplicationService --> Controller : jobReference, status
+                    deactivate ApplicationService
+
+                    Controller --> ListPersonalDataCandidateUI : jobReference, status
+                deactivate Controller
+
+                ListPersonalDataCandidateUI -> Controller  : displayApplicationsByCandidateId(username)
+
+                    activate Controller
+
+                    Controller -> ApplicationService : findApplicationsByCandidateId(username)
+                        activate ApplicationService
+
+                                ApplicationService -> ApplicationRepository : findApplicationsByCandidateId(username)
+                            activate ApplicationRepository
+
+                                    ApplicationRepository --> ApplicationRepository : select(date)
+                                    ApplicationRepository --> ApplicationService : date
+                            deactivate ApplicationRepository
+
+                                ApplicationService --> Controller : date
+                        deactivate ApplicationService
+
+                        Controller --> ListPersonalDataCandidateUI : date
+                    deactivate Controller
+
+                    ListPersonalDataCandidateUI --> CM : display list of applications
+
+         deactivate ListPersonalDataCandidateUI
+
+    deactivate CM
+
+@enduml

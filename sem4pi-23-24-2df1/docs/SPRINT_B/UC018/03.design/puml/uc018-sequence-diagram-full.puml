@@ -1,0 +1,106 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+title System Sequence Diagram - UC018
+
+'hide footbox
+actor CustomerManager as CM
+participant SelectJobRequirementsUI as UI <<presentation>>
+participant SelectJobRequirementsController as Controller <<application>>
+participant JobOpeningManagementService as JobOpeningManagementService <<service>>
+participant listJobRequirementsService as listJobRequirementsService <<service>>
+database JobRequirementsRepository as JobRequirementsRepository <<repository>>
+database JobOpeningRepository as JobOpeningRepository <<repository>>
+database DomainRepository as DomainRepository <<repository>>
+
+activate CM
+
+    CM -> UI : choosing the job requirements for a job opening.
+
+    activate UI
+        UI -> Controller : list with job openings
+
+             activate Controller
+                Controller -> JobOpeningManagementService : findAllAvailable()
+
+             activate JobOpeningManagementService
+                JobOpeningManagementService -> JobOpeningRepository : findAll()
+
+                    activate JobOpeningRepository
+                        JobOpeningRepository --> JobOpeningManagementService : list with job openings
+                    deactivate JobOpeningRepository
+
+                JobOpeningManagementService --> Controller : list with job openings
+             deactivate JobOpeningManagementService
+
+                Controller --> UI : list with job openings
+             deactivate Controller
+
+        UI --> CM : list with job openings
+
+    deactivate UI
+        CM -> UI : enter the job opening reference number
+
+    alt successful case
+
+        activate UI
+
+        CM -> UI : select the job requirements
+
+        UI -> Controller : assignJobRequirements()
+
+            activate Controller
+
+                Controller -> JobOpeningManagementService : findJobOpeningById(jobReference)
+
+                    activate JobOpeningManagementService
+                        JobOpeningManagementService -> JobOpeningRepository : findByJobReference(id)
+
+                        activate JobOpeningRepository
+                            JobOpeningRepository --> DomainRepository : ofIdentity(reference)
+
+                            activate DomainRepository
+                                DomainRepository --> JobOpeningRepository : jobOpening
+
+                            deactivate DomainRepository
+
+                            JobOpeningRepository --> JobOpeningManagementService : jobOpening
+                        deactivate JobOpeningRepository
+
+                        JobOpeningManagementService -> listJobRequirementsService : findJobRequirementsById(JobRequirementsReference)
+
+                        activate listJobRequirementsService
+                            listJobRequirementsService -> JobRequirementsRepository :findByDesignation(id)
+
+                            activate JobRequirementsRepository
+                                JobRequirementsRepository --> listJobRequirementsService : sfdf
+
+                            deactivate JobRequirementsRepository
+
+                            listJobRequirementsService --> JobOpeningManagementService : djjfdj
+
+                        deactivate listJobRequirementsService
+
+                        JobOpeningManagementService --> Controller : defineJobRequirements()
+                    deactivate JobOpeningManagementService
+                    Controller --> UI : defineJobRequirements
+
+            deactivate Controller
+
+                UI-->CM : the job requirements was successfully selected
+
+    else failure case
+        UI --> CM : the job requirements reference number is invalid
+        deactivate UI
+    end
+
+
+
+deactivate CM
+
+
+@enduml

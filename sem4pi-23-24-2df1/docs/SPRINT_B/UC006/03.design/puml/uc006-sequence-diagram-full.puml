@@ -1,0 +1,137 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "Costumer Manager" as CM
+participant ": AddJobOpeningUI" as UI
+
+
+participant ": AddJobOpeningController" as Controller
+participant JobOppeningManagmentService as Service <<service>>
+participant JobOpeningBuilder as Builder <<builder>>
+
+
+entity "jobOpening:JobOpening" as Domain <<domain>>
+participant " PersistenceContext" as Persistence <<persistence>>
+participant " RepositoryFactory" as Factory <<factory>>
+database JobOpeningRepository as Repository <<repository>>
+
+
+
+activate CM
+CM -> UI : asks to register a job opening.
+
+activate UI
+    UI -> Controller: register
+UI -> CM : requests function
+deactivate UI
+
+CM-> UI : provides function
+
+
+activate UI
+UI -> CM : requests Address
+deactivate UI
+
+CM-> UI : provides Address
+
+
+activate UI
+UI -> CM : display customer
+deactivate UI
+
+CM-> UI : select customer
+
+
+activate UI
+UI -> CM : requests Number of vacancies
+deactivate UI
+
+CM-> UI : provides Number of vacancies
+
+
+activate UI
+UI -> CM : requests Description
+deactivate UI
+
+CM-> UI : provides Description
+
+
+activate UI
+UI -> CM : display Contract Types (full-time, part-time)
+deactivate UI
+
+CM-> UI : select Contract Type
+
+
+activate UI
+UI -> CM : display Modes (remote, hybrid, onsite)
+deactivate UI
+
+CM-> UI : select Mode
+
+
+activate UI
+
+UI -> Controller : addJobOpening (function, address, company, numberOfVacancies, description, contractType, mode)
+
+activate Controller
+Controller -> Service: AddJobOpening(function, address, company, numberOfVacancies, description, contractType, mode)
+activate Service
+
+Service -> Builder: new SystemUserBuilder()
+
+
+ activate Builder
+  Builder --> Service : jobOpeningBuilder
+
+  Service -> Builder: jobOpeningBuilder.with(function, address, company, numberOfVacancies, description, contractType, mode)
+ Service -> Builder: jobOpeningBuilder.with(function, address, company, numberOfVacancies, description, jobReference, contractType, mode)
+ Service -> Builder: jobOpeningBuilder.build()
+
+ Builder -> Domain : newJobOpening(function, address, company, numberOfVacancies, description, contractType, mode)
+ activate Domain
+ Domain --> Builder: user
+ deactivate Domain
+ Builder --> Service: newUser
+ deactivate Builder
+ Service -> Persistence: repositories()
+activate Persistence
+
+ Persistence -> Factory: create
+
+ Persistence --> Service: factory
+ deactivate Persistence
+
+ Service -> Repository: obtains max Job Reference
+
+Service --> Controller: repositories
+ deactivate Service
+
+ Controller -> Factory: jobOpening()
+ activate Factory
+ Factory -> Repository: create
+Factory --> Controller: jobOpeningRepository
+deactivate Factory
+
+
+Controller->Repository:save(jobOpening)
+activate Repository
+ Repository->Repository:insert(jobOpening)
+ activate Repository
+deactivate Repository
+  Repository-->Controller: jobOpening
+  deactivate Repository
+Controller->UI: jobOpening
+deactivate Controller
+
+ UI-->CM: inform (in)success of operation
+deactivate UI
+deactivate CM
+
+
+@enduml

@@ -1,0 +1,57 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC001
+actor Admin as Admin
+participant ":System" as System
+
+activate Admin
+    Admin -> System: Login
+    activate System
+
+        System -> System: Validate login
+
+        System --> Admin: Allow access to the backoffice application with admin permissions
+    deactivate System
+
+    Admin -> System: Create new backoffice user
+    activate System
+
+        System --> Admin: Ask for user's name
+    deactivate System
+
+    Admin -> System: Enter user's name
+    activate System
+
+        System --> Admin: Ask for user's email
+    deactivate System
+
+    Admin -> System: Enter user's email
+    activate System
+
+        System --> Admin: Ask for user's password
+    deactivate System
+
+    Admin -> System: Enter user's password
+    activate System
+
+        System --> Admin: Ask for user's role(s)
+    deactivate System
+
+    Admin -> System: Enter user's role(s)
+    activate System
+
+        System -> System: Validate user's details
+
+        alt Success
+            System --> Admin: Inform user created
+        else Error
+            System --> Admin: Inform error
+        end
+    deactivate System
+
+deactivate Admin
+
+@enduml

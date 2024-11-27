@@ -1,0 +1,4 @@
+INTERVIEW "Python Programmer"
+
+INTQUES [Integer] "How many letters has Python?" [100];
+SOL <6|1>;

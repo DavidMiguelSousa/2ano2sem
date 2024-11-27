@@ -1,0 +1,39 @@
+@startuml
+skinparam monochrome false
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+left to right direction
+top to bottom direction
+
+hide circle
+hide methods
+
+title Domain Model - UC019
+
+package InterviewAggregate {
+    class Interview <<Root Entity>>
+    class InterviewModel <<Value Object>>
+}
+
+package JobOpeningAggregate {
+    class JobOpening <<Root Entity>>
+    class JobReference <<Value Object>>
+    class JobRequirements <<Value Object>>
+}
+
+class ANTLR <<Service>> {
+}
+
+Interview "1" -- "1" InterviewModel
+
+JobOpening "1" -- "1" JobReference
+JobOpening "1" -- "1" JobRequirements
+
+JobRequirements <-- ANTLR
+
+InterviewModel <-- ANTLR
+
+@enduml

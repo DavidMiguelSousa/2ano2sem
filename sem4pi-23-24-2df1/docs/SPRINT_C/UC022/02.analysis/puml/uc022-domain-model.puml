@@ -1,0 +1,82 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+'skinparam linetype ortho
+
+skinparam classAttributeIconSize 0
+
+left to right direction
+top to bottom direction
+
+hide circle
+hide methods
+
+title Domain Model (DM) - UC022
+
+class CustomerManager <<Entity>>
+
+class Customer <<Entity>>
+
+class SystemUser <<Entity>>
+
+package JobApplicationAggregate{
+    class JobApplication <<Root Entity>>
+    class JobApplicationRank <<Value Object>>
+}
+
+package JobOpeningAggregate {
+    class JobOpening <<Root Entity>>
+    class JobReference <<Value Object>>
+    class JobOpeningProcess <<Value Object>>
+    enum Phase <<Value Object>> {
+        APPLICATION
+        SCREENING
+        INTERVIEWS
+        ANALYSIS
+        RESULT
+    }
+    enum Status <<Value Object>> {
+        PENDING
+        OPEN
+        CLOSE
+    }
+    class NumberOfVacancies <<Value Object>>
+    class InterviewModel <<Value Object>>
+    class JobOpeningRanks <<Value Object>>
+}
+
+package InterviewAggregate{
+    class Interview <<Root Entity>>
+    class InterviewDate <<Value Object>>
+    class InterviewGrade <<Value Object>>
+}
+
+SystemUser "1" --> "1" CustomerManager
+SystemUser "1" --> "1" Customer
+
+CustomerManager "1" ---> "*" Customer : manages
+CustomerManager "1" ---> "*" JobApplication : manages
+
+SystemUser "1" --> "*" JobApplication
+Customer "1  " --> " * " JobOpening
+
+JobApplication "1" -left-> "1" JobApplicationRank
+Interview "1" --> "1" InterviewGrade
+
+JobApplication --> Interview
+Interview --> JobOpening: from
+
+JobOpening "1" -- "1" InterviewModel : has
+JobOpening "1" -- "1" JobOpeningRanks : has
+JobOpening "1" -- "1" NumberOfVacancies
+JobOpening "1" -- "1" JobReference
+JobOpening "1" - "*" JobApplication : has
+
+JobOpening "1" --> "1" JobOpeningProcess : has
+
+JobOpeningProcess "1" --> "1" Phase
+JobOpeningProcess "1" --> "1" Status
+
+Interview "1" --> "1" InterviewDate
+
+@enduml

@@ -1,0 +1,53 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+title Domain Model (DM) - UC001
+
+package SystemUserAggregate {
+
+    class EmailAddress <<value>> <<id>>
+
+    class SystemUser <<root>>
+
+    class Password <<value>>
+
+    class Name <<value>>
+
+    class RoleSet <<value>>
+
+    class RoleAssignment <<entity>>
+
+    class Role <<value>>
+
+    class RoleSet <<value>>
+
+    class Set<RoleAssignment> <<value>>
+}
+
+class PasswordPolicy <<service>>
+
+class PasswordEncoder <<service>>
+
+class SystemUserBuilder <<factory>>
+
+SystemUserBuilder ..> SystemUser
+SystemUserBuilder ..> PasswordPolicy
+SystemUserBuilder ..> PasswordEncoder
+
+SystemUser -> Name
+SystemUser -> Password
+SystemUser -> EmailAddress
+SystemUser -left-> RoleSet
+RoleSet ..|> Set
+RoleSet .down.> RoleAssignment
+Role <-down- RoleAssignment
+Password ..> PasswordPolicy
+Password ..> PasswordEncoder
+
+@enduml

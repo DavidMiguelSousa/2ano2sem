@@ -1,0 +1,39 @@
+INTERVIEW "Template 2"
+
+DATEQUES [DD/MM/YYYY] "When it's the first day of the year 2020?" [10];
+SOL <1/1/2020|1>;
+
+DECQUES [Decimal] "In a text mining task, you processed a document containing 450 words and found that 72 of those words were unique. What is the ratio of unique words to total words in the document, rounded to two decimal places?" [10];
+SOL <0.16|1>;
+
+INTQUES [Integer] "How many @ are there in a email address?" [10];
+SOL <1|1>;
+
+MCQUES [Numbers] "Which of the following are core tasks in the field of informatics?" [10];
+1-OPT Developing algorithms to process and analyze data;
+2-OPT Implementing security measures for information systems;
+3-OPT Marketing new software products;
+4-OPT Repairing hardware components like hard drives;
+5-OPT Designing electrical circuits;
+SOL <1|0.8>;
+SOL <2|0.6>;
+SOL <1, 2|1>;
+
+NSQUES [1-5] "How much do you love FEUP?" [10];
+SOL <1|1>;
+
+SAQUES [Text] "What's the special character used in a email address?" [10];
+SOL <@|1>;
+
+SCQUES [Number] "Which technology is primarily used to secure online transactions?" [10];
+1-OPT Encryption algorithms;
+2-OPT Fiber optic cables;
+3-OPT USB technology;
+4-OPT Cloud storage platforms;
+SOL <Encryption algorithms|1>;
+
+TIMEQUES [HH:MM] "How long is 135 minutes?" [10];
+SOL <2:15|1>;
+
+TFQUES [TRUE|FALSE] "HTML isn't a programming language." [10];
+SOL <TRUE|1>;

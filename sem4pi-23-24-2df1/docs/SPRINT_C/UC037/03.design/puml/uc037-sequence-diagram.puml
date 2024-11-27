@@ -1,0 +1,199 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC037
+
+actor Operator as Operator
+participant UploadTextJobRequirementsUI as UI <<presentation>>
+participant UploadTextJobRequirementsController as Controller <<application>>
+participant ": JobOpeningManagementService" as JobOpeningService  <<service>>
+participant ": AuthorizationService" as AuthService <<service>>
+participant ": JobApplicationManagementService" as JobApplicationService <<service>>
+participant ": JobRequirementsManagementService" as RequirementsService <<service>>
+
+database JobOpeningRepository as JobOpeningRepository <<repository>>
+database JobApplicatitonRepository as JobApplicatitonRepository <<repository>>
+
+activate Operator
+
+    Operator --> UI: Select the import file with response candidate
+    activate UI
+
+
+    UI -> Controller: create()
+
+       activate Controller
+
+            UI -> Controller : allJobOpening()
+
+
+                Controller -> JobOpeningService : findAllAvailable()
+
+           activate JobOpeningService
+
+                  JobOpeningService -> AuthService : ensureAuthenticatedUserHasAnyOf()
+
+                    activate AuthService
+
+                        AuthService --> JobOpeningService : (in)success authentication
+
+                    deactivate AuthService
+
+                  JobOpeningService -> JobOpeningRepository : findAll()
+
+                    activate JobOpeningRepository
+
+                        JobOpeningRepository --> JobOpeningService : jobOpenings
+
+                    deactivate JobOpeningRepository
+
+                  JobOpeningService --> Controller : jobOpenings
+
+           deactivate JobOpeningService
+
+            Controller --> UI : jobOpenings
+
+       deactivate Controller
+
+       UI --> Operator : list of job openings
+
+    deactivate UI
+
+       Operator -> UI : Select a jobOpening
+
+         activate UI
+
+                UI -> Controller : allJobApplicationsByJobOpening(selectedJobOpening)
+
+                 activate Controller
+
+                      Controller -> JobApplicationService : jobApplicationOf(jobOpening)
+
+                            activate JobApplicationService
+
+                                JobApplicationService -> JobApplicatitonRepository : findJobApplicationsByJobOpening(jobOpening)
+
+                                    activate JobApplicatitonRepository
+
+                                        JobApplicatitonRepository --> JobApplicationService : jobApplications
+
+                                    deactivate JobApplicatitonRepository
+
+                                JobApplicationService --> Controller : jobApplications
+
+                            deactivate JobApplicationService
+
+                      Controller --> UI : jobApplications
+
+                 deactivate Controller
+
+                UI --> Operator : list of job applications
+
+            deactivate UI
+
+            Operator -> UI : Select a jobApplication
+            note right of Operator
+                Export automatically the text requirements
+            end note
+
+            activate UI
+
+                UI -> Controller : searchJobRequirements(fileName)
+
+                    activate Controller
+
+                        Controller -> RequirementsService : searchJobRequirements()
+
+                            activate RequirementsService
+
+                                RequirementsService -> RequirementsService : fullPath.toString()
+
+
+                                RequirementsService --> Controller : fullPath.toString()
+
+                            deactivate RequirementsService
+
+                        Controller --> UI : fullPath.toString()
+
+                    deactivate Controller
+
+                            UI -> Controller: exportTextRequirements(filePath, nameFile)
+
+                                activate Controller
+
+                                    Controller -> RequirementsService : exportTextRequirements(filePath, nameFile)
+
+                                        activate RequirementsService
+
+                                            RequirementsService -> RequirementsService : Files.copy(sourcePath. destinationPath. StandardCopyOption.REPLACE_EXISTING)
+
+                                            RequirementsService --> Controller : file (not)exported to downloads successfully
+
+                                        deactivate RequirementsService
+
+                                    Controller --> UI : file (not)exported to downloads successfully
+
+                                deactivate Controller
+
+                                UI --> Operator : file (not)exported to downloads successfully
+
+                                alt if file exported successfully
+
+                                    UI -> Operator : File exported successfully and Display if you want to import the file.
+
+                                    deactivate UI
+
+                                    alt if answer="Yes"
+
+                                    Operator -> UI : Enter the file path to import
+
+                                    activate UI
+
+                                        UI -> Controller : importTextRequirements(filePath, destinationPath, nameFile)
+
+                                        activate Controller
+
+                                            Controller -> RequirementsService : importTextRequirements(downloadsPath, destinationPath, nameFile)
+
+                                            activate RequirementsService
+
+                                                RequirementsService -> RequirementsService : copyFile(destination, pathdownloadsPath, nameFile, newFileName)
+
+                                                RequirementsService -> RequirementsService : Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING)
+
+
+                                                RequirementsService --> Controller : file (not)imported to path SCOMP successfully
+
+                                            deactivate RequirementsService
+
+                                            Controller --> UI : file (not)imported to path SCOMP successfully
+
+                                        deactivate Controller
+
+                                        UI --> Operator : file imported
+
+
+                                    else if answer="No"
+
+                                        UI --> Operator : File not imported
+
+                                    end
+
+                                else if file not exported successfully
+
+                                    UI --> Operator : File not exported successfully
+
+                                end
+
+                        deactivate Operator
+
+                    deactivate Operator
+
+            deactivate UI
+deactivate Operator
+
+@enduml

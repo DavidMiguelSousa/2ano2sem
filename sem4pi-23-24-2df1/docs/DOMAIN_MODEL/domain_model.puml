@@ -1,0 +1,282 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+top to bottom direction
+left to right direction
+
+hide methods
+hide circle
+
+title Project Domain Model - Jobs4U
+
+package SystemUserAggregate {
+    class SystemUser <<Root Entity>>
+    class Username <<Value Object>>
+    class Name <<Value Object>>
+    class EmailAddress <<Value Object>>
+    class Password <<Value Object>>
+    enum Role <<Value Object>> {
+        ADMIN
+        CUSTOMER_MANAGER
+        OPERATOR
+        CUSTOMER
+        CANDIDATE
+    }
+}
+class PasswordEncoder <<Service>>
+class PasswordPolicy <<Service>>
+class PasswordGenerator <<Service>>
+note right of SystemUserAggregate: out of scope (provided by EAPLI FRAMEWORK)
+
+class Admin
+note top of Admin: conceptual class
+
+class CustomerManager
+note left of CustomerManager: conceptual class
+
+class Operator
+note bottom of Operator: conceptual class
+
+class LanguageEngineer
+note right of LanguageEngineer: conceptual class
+
+package CustomerAggregate {
+    class Customer <<Root Entity>>
+    class CustomerCode <<Value Object>>
+}
+
+package CandidateAggregate {
+    class Candidate <<Root Entity>>
+}
+
+class Address <<Value Object>>
+enum District <<Value Object>> {
+    ACORES
+    AVEIRO
+    BEJA
+    BRAGA
+    BRAGANÇA
+    CASTELO_BRANCO
+    COIMBRA
+    ÉVORA
+    FARO
+    GUARDA
+    LEIRIA
+    LISBOA
+    MADEIRA
+    PORTALEGRE
+    PORTO
+    SANTARÉM
+    SETÚBAL
+    VIANA_DO_CASTELO
+    VILA_REAL
+    VISEU
+}
+class County <<Value Object>>
+class Parish <<Value Object>>
+class Street <<Value Object>>
+class DoorNumber <<Value Object>>
+class PostalCode <<Value Object>>
+
+package JobOpeningAggregate {
+    class JobOpening <<Root Entity>>
+    class JobReference <<Value Object>>
+    class JobDescription <<Value Object>>
+    class JobFunction <<Value Object>>
+    enum JobMode <<Value Object>> {
+        ONSITE
+        HYBRID
+        REMOTE
+    }
+    class ContractType <<Value Object>> {
+        FULL_TIME
+        PART_TIME
+    }
+    class NumberOfVacancies <<Value Object>>
+    enum Phase <<Value Object>> {
+        APPLICATION
+        SCREENING
+        INTERVIEWS
+        ANALYSIS
+        RESULT
+    }
+    class PhaseDetails <<Value Object>>
+    class DateInterval <<Value Object>>
+    enum Status <<Value Object>> {
+        PENDING
+        IN_PROGRESS
+        COMPLETED
+    }
+    package InterviewModelPackage {
+        class InterviewModel <<Value Object>>
+        class InterviewModelDesignation <<Value Object>>
+        class InterviewModelDescription <<Value Object>>
+        class InterviewModelFileExtension <<Value Object>>
+        class InterviewModelFQCLassName <<Value Object>>
+    }
+    package JobRequirementsPackage {
+        class JobRequirements <<Value Object>>
+        class JobRequirementsDesignation <<Value Object>>
+        class JobRequirementsDescription <<Value Object>>
+        class JobRequirementsFileExtension <<Value Object>>
+        class JobRequirementsFQCLassName <<Value Object>>
+    }
+}
+note right of JobFunction: Designation (provided by EAPLI FRAMEWORK)
+note right of JobDescription: Description (provided by EAPLI FRAMEWORK)
+note right of InterviewModelDesignation: Designation (provided by EAPLI FRAMEWORK)
+note right of InterviewModelDescription: Description (provided by EAPLI FRAMEWORK)
+note right of InterviewModelFileExtension: FileExtension (provided by EAPLI FRAMEWORK)
+note right of InterviewModelFQCLassName: FQClassName (provided by EAPLI FRAMEWORK)
+note right of JobRequirementsDesignation: Designation (provided by EAPLI FRAMEWORK)
+note right of JobRequirementsDescription: Description (provided by EAPLI FRAMEWORK)
+note right of JobRequirementsFileExtension: FileExtension (provided by EAPLI FRAMEWORK)
+note right of JobRequirementsFQCLassName: FQClassName (provided by EAPLI FRAMEWORK)
+
+package JobApplicationAggregate {
+    class JobApplication <<Root Entity>>
+    class JobApplicationReference <<Value Object>>
+    enum JobApplicationStatus <<Value Object>> {
+        PENDING
+        APPROVED
+        REJECTED
+    }
+    class Rank <<Value Object>>
+    class RankValue <<Value Object>>
+    enum RankStatus <<Value Object>> {
+        PENDING
+        RANKED
+        UNRANKED
+    }
+    class CurriculumVitae <<Value Object>>
+    class PhoneNumber <<Value Object>>
+    class JobApplicationEmail <<Value Object>>
+    class JobApplicationBigFile <<Value Object>>
+    class JobApplicationAdditionalData <<Value Object>>
+    package InterviewPackage {
+        class Interview <<Value Object>>
+        class InterviewDate <<Value Object>>
+        class InterviewName <<Value Object>>
+        class InterviewDescription <<Value Object>>
+        class InterviewGrade <<Value Object>>
+    }
+    package ApplicationRequirementsPackage {
+        class ApplicationRequirements <<Value Object>>
+        class ApplicationRequirementsDesignation <<Value Object>>
+        class ApplicationRequirementsDescription <<Value Object>>
+        enum ApplicationRequirementsStatus <<Value Object>> {
+            PENDING
+            APPROVED
+            REJECTED
+        }
+    }
+}
+note right of JobApplicationStatus: ApprovalStatus (provided by EAPLI FRAMEWORK)
+note right of InterviewName: Designation (provided by EAPLI FRAMEWORK)
+note right of InterviewDescription: Description (provided by EAPLI FRAMEWORK)
+note right of ApplicationRequirementsStatus: ApprovalStatus (provided by EAPLI FRAMEWORK)
+
+class ApplicationsFileBot <<Service>>
+
+class ANTLR <<Service>>
+
+SystemUser "1" -- "1" Name
+SystemUser "1" -- "1" Username
+SystemUser "1" -- "1" EmailAddress
+SystemUser "1" -- "1" Password
+SystemUser "1" -- "*" Role
+note right of Username: in the context of our app, is the EmailAddress of the user
+
+Password "1" -. "1" PasswordEncoder
+Password "1" -. "1" PasswordPolicy
+Password "1" -. "1" PasswordGenerator
+
+SystemUser <--- Admin : is a <
+SystemUser <--- CustomerManager : is a <
+SystemUser <--- Operator : is a <
+SystemUser <--- LanguageEngineer : is a <
+SystemUser <--- Customer : is a <
+SystemUser <--- Candidate : is a <
+
+Admin "1" ------------ "*" CustomerManager : manages >
+Admin "1" ------ "*" Operator : manages >
+Admin "1" ------ "*" LanguageEngineer : manages >
+
+CustomerManager "1" -------- "*" Customer : manages >
+
+Operator "1" -------------- "*" Candidate : manages >
+
+Candidate "1" ------- "*" JobApplication : applies to >
+
+CustomerManager "1" -- "*" JobOpening : creates >
+
+Customer "1" ---- "1" Address : has >
+
+Address "1" -- "1" District : >
+Address "1" -- "1" County : >
+Address "1" -- "1" Parish : >
+Address "1" -- "1" Street : >
+Address "1" -- "1" DoorNumber : >
+Address "1" -- "1" PostalCode : >
+
+JobOpening "1" -------- "1" Address : in >
+JobOpening "1" ------- "*" JobApplication : to <
+JobOpening "1" --------- "0..1" InterviewModel : has >
+JobOpening "1" --------- "1" JobRequirements : has >
+JobOpening "1" -- "1" JobReference : identified by >
+JobOpening "1" -- "1" JobFunction : with >
+JobOpening "1" -- "1" JobDescription : with >
+JobOpening "1" -- "1" ContractType : with >
+JobOpening "1" -- "1" JobMode : with >
+JobOpening "1" -- "1" NumberOfVacancies : with >
+JobOpening "1" -- "1" Status : has >
+JobOpening "1" -- "4..5" Phase : has >
+
+Phase "1" -- "1" PhaseDetails : with >
+PhaseDetails "1" -- "1" Status : has >
+PhaseDetails "1" -- "1" DateInterval : has >
+
+JobApplication "1" -- "1" JobApplicationReference : identified by >
+JobApplication "1" -- "1" JobApplicationStatus : with >
+JobApplication "1" -- "1" CurriculumVitae : of <
+JobApplication "1" -- "1" PhoneNumber : with >
+JobApplication "1" ---- "0..1" Interview : has >
+JobApplication "1" -- "1" Rank : with >
+JobApplication "1" -- "1" JobApplicationEmail : with >
+JobApplication "1" -- "1" JobApplicationBigFile : with >
+JobApplication "1" -- "1" JobApplicationAdditionalData : with >
+JobApplication "1" -- "1" ApplicationRequirements : with >
+
+Interview "1" -- "1" InterviewDate : on >
+Interview "1" -- "1" InterviewName : identified by >
+Interview "1" -- "1" InterviewDescription : with >
+Interview "1" -- "1" InterviewGrade : with >
+
+ApplicationRequirements "1" -- "1" ApplicationRequirementsDesignation : identified by >
+ApplicationRequirements "1" -- "1" ApplicationRequirementsDescription : with >
+ApplicationRequirements "1" -- "1" ApplicationRequirementsStatus : with >
+
+JobApplication <-. ApplicationsFileBot : <
+
+Rank "1" -- "1" RankValue : with >
+Rank "1" -- "1" RankStatus : with >
+
+InterviewModel "1" -- "1" InterviewModelDesignation : identified by >
+InterviewModel "1" -- "1" InterviewModelDescription : with >
+InterviewModel "1" -- "1" InterviewModelFileExtension : with >
+InterviewModel "1" -- "1" InterviewModelFQCLassName : with >
+
+JobRequirements "1" -- "1" JobRequirementsDesignation : identified by >
+JobRequirements "1" -- "1" JobRequirementsDescription : with >
+JobRequirements "1" -- "1" JobRequirementsFileExtension : with >
+JobRequirements "1" -- "1" JobRequirementsFQCLassName : with >
+
+InterviewModel <-. ANTLR : <
+JobRequirements <-. ANTLR : <
+
+@enduml

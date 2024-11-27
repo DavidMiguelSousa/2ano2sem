@@ -1,0 +1,8 @@
+INTERVIEW "Example-2"
+
+SCQUES [Number] "Which technology is primarily used to secure online transactions?" [10];
+1-OPT Encryption algorithms;
+2-OPT Fiber optic cables;
+3-OPT USB technology;
+4-OPT Cloud storage platforms;
+SOL <1|1>;

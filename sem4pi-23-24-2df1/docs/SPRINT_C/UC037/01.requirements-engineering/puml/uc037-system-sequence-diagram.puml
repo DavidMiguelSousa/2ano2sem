@@ -1,0 +1,56 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC037
+actor Operator as Operator
+participant ":System" as System
+
+activate Operator
+
+
+    Operator -> System:Select the import file with response candidate
+    activate System
+
+        System --> Operator: Show list of Job Openings
+    deactivate System
+
+    Operator -> System: Selects one of the Job Openings
+    activate System
+     System --> Operator: Show list of Job Applications for the selected Job Opening
+        deactivate System
+
+        Operator -> System: Selects one of the Job Applications
+        activate System
+      alt if file exported successfully
+    System --> Operator: Display if you want to import the file.
+
+         alt if answer="Yes"
+            Operator -> System: Enter the file path to import
+            System --> Operator: Show message that the file was imported successfully
+
+
+         else if answer="No"
+            System --> Operator:Show message that the file was not imported successfully
+
+         end
+           else if file not exported successfully
+
+     System --> Operator : File not exported successfully
+
+        end
+
+
+
+
+
+
+
+
+
+
+
+
+
+@enduml

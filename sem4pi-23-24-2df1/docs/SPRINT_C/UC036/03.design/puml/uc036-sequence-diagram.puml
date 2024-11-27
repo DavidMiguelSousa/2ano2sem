@@ -1,0 +1,113 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC036
+
+actor Admin as Actor
+participant DisplayJobApplicationDataUI as UI <<presentation>>
+participant DisplayJobApplicationDataController as Controller <<application>>
+participant AuthorizationService as Authz <<service>>
+participant UserSession as Session <<Session>>
+participant JobOpeningManagementService as Service <<service>>
+participant JobApplicationManagementService as Service1 <<service>>
+participant PersistenceContext as Persistence <<persistence>>
+participant RepositoryFactory as Factory <<factory>>
+database JobOpeningRepository as Repository <<repository>>
+database JobApplicationRepository as Repository1 <<repository>>
+
+Actor --> UI: Display all the data of an application
+activate UI
+
+    UI -> Controller: create()
+
+    UI -> Controller: jobOpenings()
+    activate Controller
+
+    Controller -> Authz: create()
+
+    Controller -> Authz: ensureAuthenticatedUserHasAnyOf(BaseRoles.CUSTOMER_MANAGER)
+    activate Authz
+
+    Authz -> Session: create()
+
+    Controller -> Authz : session()
+
+    Authz -> Controller : session
+    deactivate Authz
+
+    Controller -> Session : authenticatedUser()
+    activate Session
+
+    Session -> Controller : user
+    deactivate Session
+
+    Controller -> Service: create()
+
+    Controller -> Service: findAll()
+    activate Service
+
+    Service -> Persistence: repositories()
+    activate Persistence
+
+    Persistence -> Factory: create()
+
+    Persistence -> Service: factory
+    deactivate Persistence
+
+    Service -> Factory: jobOpenings()
+    activate Factory
+
+    Factory -> Repository: create()
+
+    Factory -> Service: jobOpeningRepository
+    deactivate Factory
+
+    Service -> Repository: findAllActive()
+    activate Repository
+
+    Repository -> Service: jobOpenings
+    deactivate Repository
+
+    Service -> Controller: jobOpenings
+    deactivate Service
+
+    Controller -> UI: jobOpenings
+    deactivate Controller
+
+    UI -> Actor: Display all job openings and ask user to select one
+
+    Actor -> UI: Choose job opening
+
+    UI -> Controller: jobApplicationsByJobOpening(jobOpening)
+    activate Controller
+
+    Controller -> Service1: create()
+
+    Controller -> Service1: jobApplicationsOf(jobOpening)
+    activate Service1
+
+    Service1 -> Repository1: applicationsByJobOpening(jobOpening)
+    activate Repository1
+
+    Repository1 -> Service1: jobApplications
+    deactivate Repository1
+
+    Service1 -> Controller: jobApplications
+    deactivate Service1
+
+    Controller -> UI: jobApplications
+    deactivate Controller
+
+    UI -> Actor: Show job applications for the selected job opening
+
+    Actor -> UI: Choose job application
+
+    UI -> Actor: Display all the data of the selected application
+
+deactivate UI
+
+@enduml

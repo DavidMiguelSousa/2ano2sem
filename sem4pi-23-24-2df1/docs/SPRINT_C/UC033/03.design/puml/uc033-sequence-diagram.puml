@@ -1,0 +1,89 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+title Sequence Diagram (SSD) - UC033
+actor "Customer Manager" as CM
+participant "ListJobOpeningsInterviewGradesUI" as UI
+participant "ListJobOpeningsInterviewGradesController" as Controller
+participant "JobOpeningManagementService" as jobOpService
+participant "JobApplicationManagementService" as jobAppService
+participant "repositories:Repositories" as repositories
+participant "JobOpeningRepository" as jobOpRepo
+participant "JobApplicationRepository" as jobAppRepo
+
+activate CM
+    CM -> UI: Requests to display job opening's interview grades
+    activate UI
+        UI -> Controller : jobOpeningsWithPhaseInterviewCompleted()
+            activate Controller
+            Controller -> repositories : repositories()
+            Controller -> repositories : jobOpenings()
+                activate repositories
+                repositories --> Controller : jobOpeningsRepo
+            deactivate repositories
+            Controller -> jobOpService : new JobOpeningManagementService(jobOpeningsRepo)
+            Controller -> jobOpService : jobOpeningsWithPhaseInterviewCompleted()
+                activate jobOpService
+                jobOpService -> jobOpService : jobOpeningsWithPhaseOn(Phase.ANALYSIS)
+                    activate jobOpService
+                jobOpService -> jobOpRepo : findAll()
+                    activate jobOpRepo
+                    jobOpRepo --> jobOpService : allJobOpenings
+                deactivate jobOpRepo
+                loop JobOpening jobOpening : allJobOpening
+                jobOpService -> jobOpService : jobOpenings = jobOpening.phases().get(phase).status().equals(Status.IN_PROGRESS)
+                end loop
+                deactivate jobOpService
+                jobOpService -> jobOpService : jobOpenings.removeIf(jobOpening -> !jobOpening.phases().containsKey(Phase.INTERVIEW));
+                    activate jobOpService
+                deactivate jobOpService
+                jobOpService --> Controller : jobOpeningsWithPhaseInterviewCompleted
+            deactivate jobOpService
+            Controller --> UI : jobOpeningsWithPhaseInterviewCompleted
+        deactivate Controller
+        UI --> CM: Display job openings
+    deactivate UI
+
+    CM -> UI: Select job opening
+    activate UI
+        UI -> Controller : jobApplicationsOf(jobOpening)
+        activate Controller
+        Controller -> repositories : repositories
+        Controller -> repositories : jobApplications()
+            activate repositories
+            repositories --> Controller : jobApplicationsRepo
+        deactivate repositories
+        Controller -> jobAppService : new JobApplicationManagementService(jobApplicationsRepo)
+        Controller -> jobAppService : jobApplicationsOf(jobOpening)
+            activate jobAppService
+            jobAppService -> jobAppRepo : applicationsByJobOpening()
+                activate jobAppRepo
+                jobAppRepo --> jobAppService : jobApplicationsOfJobOpening
+            deactivate jobAppRepo
+            jobAppService -> Controller : jobApplicationsOfJobOpening
+        deactivate jobAppService
+        Controller --> UI : jobApplicationsOfJobOpening
+    deactivate Controller
+    UI -> Controller : filterJobApplicationsWithInterview(jobApplicationsOfJobOpening)
+        activate Controller
+        Controller -> jobAppService : jobApplications = filterJobApplicationsWithInterview(jobApplicationsOfJobOpening)
+            activate jobAppService
+            jobAppService -> jobAppService : jobApplications = jobApplicationsOfJobOpening.stream().filter(jobApplication -> jobApplication.interview().isPresent()).collect(Collectors.toList())
+                activate jobAppService
+            deactivate jobAppService
+            jobAppService --> Controller : jobApplications
+            deactivate jobAppService
+        Controller --> UI : jobApplications
+        deactivate Controller
+
+    loop JobApplication jobApplication : jobApplications
+        UI --> CM : jobApplication.interview().grade()
+    deactivate UI
+    end loop
+deactivate CM
+
+@enduml

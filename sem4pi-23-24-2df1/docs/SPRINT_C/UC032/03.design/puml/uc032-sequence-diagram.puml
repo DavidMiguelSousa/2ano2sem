@@ -1,0 +1,253 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title Sequence Diagram (SSD) - UC032
+
+actor "Customer Manager" as CM
+participant "EvaluateJobOpeningInterviewsUI" as UI
+participant "EvaluateJobOpeningInterviewsController" as Controller
+participant "JobOpeningManagementService" as jobOpeningService
+participant "JobApplicationManagementService" as jobApplicationService
+participant "InterviewManagementService" as interviewService
+participant "InterviewModelParser" as interviewParser
+participant "InterviewVisitor" as interviewVisitor
+participant "repositories:Repositories" as repositories
+database "JobOpeningRepository" as jobOpeningRepository
+database "JobApplicationRepository" as jobApplicationRepository
+
+autonumber 1
+
+activate CM
+CM -> UI: Requests to evaluate a job opening's interviews
+    activate UI
+    UI -> Controller: jobOpeningWithInterviewPhaseCompleted();
+        activate Controller
+        Controller -> repositories : repositories();
+        Controller -> repositories: jobOpeningRepository();
+            activate repositories
+            repositories --> Controller: jobOpeningRepository
+        deactivate repositories
+        Controller -> jobOpeningService: new JobOpeningManagementService(jobOpeningRepository)
+        Controller -> jobOpeningService: jobOpeningWithInterviewPhaseCompleted();
+            activate jobOpeningService
+            jobOpeningService -> jobOpeningService: Iterable<JobOpening> jobOpenings = jobOpeningWithPhaseOn(Phase.ANALYSIS);
+                activate jobOpeningService
+            deactivate jobOpeningService
+            loop JobOpening jobOpening : jobOpenings
+                alt !jobOpening.phase().contains(Phase.INTERVIEW)
+                    jobOpeningService -> jobOpeningService: jobOpenings.remove(jobOpening)
+                end alt
+            end loop
+            jobOpeningService --> Controller: returns jobOpeningList = Iterable<JobOpening>
+        deactivate jobOpeningService
+        Controller --> UI: returns jobOpeningList = Iterable<JobOpening>
+    deactivate Controller
+    UI --> CM: Display job opening's list
+deactivate UI
+
+CM -> UI: Select one job opening to rank interviews
+    activate UI
+    UI -> Controller: jobApplicationsOf(jobOpening);
+        activate Controller
+        Controller -> repositories: repositories();
+        Controller -> repositories: jobApplicationRepository();
+            activate repositories
+            repositories --> Controller: jobApplicationRepository
+        deactivate repositories
+        Controller -> jobApplicationService: new JobApplicationManagementService(jobApplicationRepository)
+        Controller -> jobApplicationService: jobApplicationsOf(jobOpening);
+            activate jobApplicationService
+            jobApplicationService --> Controller: returns jobApplicationList = Iterable<JobApplication>
+        deactivate jobApplicationService
+        Controller --> UI: returns jobApplicationList = Iterable<JobApplication>
+    deactivate Controller
+
+    UI -> Controller: evaluateInterviews(jobApplicationList, jobOpening)
+        activate Controller
+        Controller -> interviewService: evaluateInterviews(jobApplicationList, jobOpening)
+            activate interviewService
+            interviewService -> interviewParser: new InterviewModelParser()
+
+            interviewService -> interviewService : Path pathInterviewModel = Paths.get("LPROG/interviewModels/" + jobOpening.reference() + ".txt");
+                activate interviewService
+            deactivate interviewService
+
+            interviewService -> interviewParser: visitInterviewModel(pathInterviewModel)
+                activate interviewParser
+                interviewParser -> interviewVisitor: new InterviewVisitor()
+                interviewParser -> interviewVisitor: visitInterviewModel(interviewModel)
+                    activate interviewVisitor
+                    interviewVisitor -> interviewVisitor : //TODO
+                    interviewVisitor -> interviewParser : questionsWithSolution
+                deactivate interviewVisitor
+                interviewParser --> interviewService: questionsWithSolution
+            deactivate interviewParser
+
+            interviewService -> interviewService: InterviewGrade totalGrade = InterviewGrade(0.0);
+                activate interviewService
+            deactivate interviewService
+
+            loop questionsWithSolution = qs
+                interviewService -> interviewService: totalGrade.incrementGrade(qs.grade());
+                    activate interviewService
+                deactivate interviewService
+            end loop
+
+            interviewService -> interviewService : Map<JobApplication, InterviewGrade> grades = new HashMap<>();
+                activate interviewService
+            deactivate interviewService
+            loop jobApplicationList
+                interviewService -> interviewService : pathInterview = Paths.get("SCOMP/fileBotFiles/" + jobOpening.reference() + "/" + jobApplication.candidate().username() + "/.txt");
+                    activate interviewService
+                deactivate interviewService
+                interviewService -> interviewVisitor : visitInterview(pathInterview)
+                    activate interviewVisitor
+                    interviewVisitor -> interviewVisitor : //TODO
+                    interviewVisitor -> interviewService : questionsWithAnswer
+                deactivate interviewVisitor
+
+                interviewService -> interviewService : InterviewGrade interviewGrade = new InterviewGrade(0.0);
+                    activate interviewService
+                deactivate interviewService
+
+                loop qs : questionsWithSolution
+                    loop qa : questionsWithAnswer
+                        alt questionsWithSolution.question().equals(questionsWithAnswer.question())
+                            alt qs.type() == QuestionType.TFQUES
+                                interviewService -> interviewService : grade = evaluateTrueFalse(qs, qa);
+                                    activate interviewService
+                                deactivate interviewService
+                                interviewService -> interviewService : interviewGrade.addGrade(grade);
+                                    activate interviewService
+                                deactivate interviewService
+
+                            else qs.type() == QuestionType.SAQUES
+                                interviewService -> interviewService : grade = evaluateShortAnswerQuestion(qs, qa);
+                                    activate interviewService
+                                deactivate interviewService
+                                interviewService -> interviewService : interviewGrade.addGrade(grade);
+                                    activate interviewService
+                                deactivate interviewService
+
+                            else qs.type() == QuestionType.SCQUES
+                                interviewService -> interviewService : grade = evaluateSingleChoiceQuestion(qs, qa);
+                                    activate interviewService
+                                deactivate interviewService
+                                interviewService -> interviewService : interviewGrade.addGrade(grade);
+                                    activate interviewService
+                                deactivate interviewService
+
+                            else qs.type() == QuestionType.MCQUES
+                                interviewService -> interviewService : grade = evaluateMultipleChoiceQuestion(qs, qa);
+                                    activate interviewService
+                                deactivate interviewService
+                                interviewService -> interviewService : interviewGrade.addGrade(grade);
+                                    activate interviewService
+                                deactivate interviewService
+
+                            else qs.type() == QuestionType.INTQUES
+                                interviewService -> interviewService : grade = evaluateIntegerQuestion(qs, qa);
+                                    activate interviewService
+                                deactivate interviewService
+                                interviewService -> interviewService : interviewGrade.addGrade(grade);
+                                    activate interviewService
+                                deactivate interviewService
+
+                            else qs.type() == QuestionType.DECQUES
+                                interviewService -> interviewService : grade = evaluateDecimalQuestion(qs, qa);
+                                    activate interviewService
+                                deactivate interviewService
+                                interviewService -> interviewService : interviewGrade.addGrade(grade);
+                                    activate interviewService
+                                deactivate interviewService
+
+                            else qs.type() == QuestionType.DATEQUES
+                                interviewService -> interviewService : grade = evaluateDateQuestion(qs, qa);
+                                    activate interviewService
+                                deactivate interviewService
+                                interviewService -> interviewService : interviewGrade.addGrade(grade);
+                                    activate interviewService
+                                deactivate interviewService
+
+                            else qs.type() == QuestionType.TIMEQUES
+                                interviewService -> interviewService : grade = evaluateTimeQuestion(qs, qa);
+                                    activate interviewService
+                                deactivate interviewService
+                                interviewService -> interviewService : interviewGrade.addGrade(grade);
+                                    activate interviewService
+                                deactivate interviewService
+
+                            else qs.type() == QuestionType.NSQUES
+                                interviewService -> interviewService : grade = evaluateNumericScaleQuestion(qs, qa);
+                                    activate interviewService
+                                deactivate interviewService
+                                interviewService -> interviewService : interviewGrade.addGrade(grade);
+                                    activate interviewService
+                                deactivate interviewService
+
+                             else
+                                interviewService -> interviewService : grade = 0;
+                                    activate interviewService
+                                deactivate interviewService
+                                interviewService -> interviewService : interviewGrade.addGrade(grade);
+                                    activate interviewService
+                                deactivate interviewService
+                            end alt
+                        end alt
+                    end loop
+                end loop
+
+                interviewService -> interviewService: InterviewGrade gradeInPercentage = interviewGrade.calculateGradeInPercentage(interviewGrade, totalGrade);
+                    activate interviewService
+                deactivate interviewService
+
+                interviewService -> interviewService : grades.put(jobApplication, gradeInPercentage);
+                    activate interviewService
+                deactivate interviewService
+            end loop
+            interviewService -->  Controller: grades
+        deactivate interviewService
+        Controller --> UI: grades
+    deactivate Controller
+
+    UI --> CM: Display interview's grades
+    UI --> CM: Save interview's grades?
+    deactivate UI
+
+    alt confirm
+    CM -> UI: Confirms to save interview's grades
+        activate UI
+        UI -> Controller: saveJobApplicationInterviewGrades(grades)
+            activate Controller
+            Controller -> jobApplicationService: saveInterviewGrades(grades)
+                activate jobApplicationService
+                loop grades
+                    jobApplicationService -> jobApplicationService: jobApplication = grade.getKey();
+                        activate jobApplicationService
+                    deactivate jobApplicationService
+                    jobApplicationService -> jobApplicationService: interviewGrade = grade.getValue();
+                        activate jobApplicationService
+                    deactivate jobApplicationService
+                    jobApplicationService -> jobApplicationService: jobApplication.saveInterviewGrade(interviewGrade);
+                        activate jobApplicationService
+                    deactivate jobApplicationService
+                    jobApplicationService -> jobApplicationRepository: jobApplicationRepository.save(jobApplication);
+                        activate jobApplicationRepository
+                        jobApplicationRepository --> jobApplicationRepository: save(jobApplication)
+                        jobApplicationRepository --> jobApplicationService: returns (un)successful
+                    deactivate jobApplicationRepository
+                end loop
+                jobApplicationService --> Controller: returns (un)successful
+            deactivate jobApplicationService
+            Controller --> UI: returns (un)successful
+
+    else cancel
+    CM -> UI: Cancels to save interview's grades
+    end alt
+    UI --> CM: Shows (un)successful message
+    deactivate UI
+deactivate CM
+
+@enduml

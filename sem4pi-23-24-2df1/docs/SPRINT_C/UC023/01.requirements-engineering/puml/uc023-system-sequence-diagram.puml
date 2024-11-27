@@ -1,0 +1,55 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title system Sequence Diagram (SSD) - UC023
+actor "Customer Manager" as actor
+participant ":System" as system
+
+autonumber 1
+
+activate actor
+
+    actor -> system: Login
+    activate system
+
+    system --> system: Validate login
+
+    system -> actor: Allow access to the backoffice application with Customer Manager permissions
+    deactivate system
+
+    actor -> system: Edit job opening
+    activate system
+
+    system -> actor: Show job opening list
+    deactivate system
+
+    actor -> system: Select job opening
+    activate system
+
+
+loop wants to edit more sections
+
+    system -> actor: Ask to select which section to edit
+    deactivate system
+
+    actor -> system: Selects
+    activate system
+
+    system -> actor: Ask for data
+    deactivate system
+
+    actor -> system: Inputs data
+    activate system
+
+    system -> actor: Ask if user wants to edit more sections
+
+
+end loop
+    system -> actor: (un)success of the operation
+    deactivate system
+
+deactivate actor
+
+@enduml

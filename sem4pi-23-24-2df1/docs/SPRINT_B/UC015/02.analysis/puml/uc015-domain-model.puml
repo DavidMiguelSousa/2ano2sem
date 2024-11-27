@@ -1,0 +1,82 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+left to right direction
+
+title Domain Model (DM) - UC015
+
+class SystemUserBuilder <<factory>>
+
+package SystemUserAggregate {
+
+    class EmailAddress <<value>>
+
+    class SystemUser <<root>>
+
+    class Password <<value>>
+
+    class Name <<value>>
+
+    class RoleSet <<value>>
+
+    class RoleAssignment <<entity>>
+
+    class Role <<value>>
+
+    class Set<RoleAssignment> <<value>>
+
+}
+
+package CandidateAggregate {
+
+    class Candidate <<root>>
+
+}
+
+package JobOpeningAggregate {
+    class JobOpening <<Root Entity>>
+    class JobReference <<Value Object>>
+    class JobOpeningStatus <<Entity>>
+
+}
+
+package JobApplicationAggregate {
+    class JobApplication <<Root Entity>>{
+        - dateApplied: Date
+    }
+}
+
+class PasswordPolicy <<service>>
+
+class PasswordEncoder <<service>>
+
+SystemUserBuilder ..> SystemUser
+
+SystemUser --> Name
+SystemUser --> Password
+SystemUser --> EmailAddress
+SystemUser --> Candidate
+SystemUser -left-> RoleSet
+
+RoleSet ..|> Set
+RoleSet .down.> RoleAssignment
+Role <-down- RoleAssignment
+
+Password ..> PasswordPolicy
+Password ..> PasswordEncoder
+
+Candidate ..> JobApplication : follows >
+
+JobApplication ..> JobOpening : related to >
+
+JobOpening "1" -- "1" JobOpeningStatus
+
+JobOpening "1" -- "1" JobReference
+
+@enduml

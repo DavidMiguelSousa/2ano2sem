@@ -1,0 +1,164 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+autonumber 1
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC001
+
+actor "Customer Manager" as CM
+participant ":RankJobApplicationsUI" as UI
+participant ":RankJobApplicationsController" as Controller
+participant ":JobApplicationManagementService" as JobApplicationManagementService
+participant ":JobOpeningManagementService" as JobOpeningManagementService
+participant "repositories:Repositories" as repositories
+database ":JobApplicationRepository" as JobApplicationRepository
+database ":JobOpeningRepository" as JobOpeningRepository
+
+activate CM
+    CM -> UI: Wants to rank the candidates for a job opening
+        activate UI
+
+        UI -> Controller: create()
+        UI -> Controller: jobOpenings()
+            activate Controller
+                Controller -> JobOpeningManagementService: jobOpenings()
+                    activate JobOpeningManagementService
+                    JobOpeningManagementService -> repositories: repositories()
+                    JobOpeningManagementService -> JobOpeningRepository: jobOpeningRepository()
+                    JobOpeningManagementService -> JobOpeningRepository: jobOpenings()
+                        activate JobOpeningRepository
+                        JobOpeningRepository --> JobOpeningManagementService: jobOpenings
+                    deactivate JobOpeningRepository
+                    JobOpeningManagementService -> JobOpeningManagementService : jobOpeningsWithPhaseAnalysisOn(jobOpenings)
+                        activate JobOpeningManagementService
+                    deactivate JobOpeningManagementService
+                    JobOpeningManagementService --> Controller: jobOpenings
+            deactivate JobOpeningManagementService
+            Controller --> UI: jobOpenings
+        deactivate Controller
+        UI --> CM: Display list of job openings
+    deactivate UI
+    CM -> UI: Selects a job opening
+        activate UI
+        UI -> Controller: jobApplications(jobOpening)
+            activate Controller
+            Controller -> JobApplicationManagementService: jobApplicationRepository()
+                activate JobApplicationManagementService
+                    JobApplicationManagementService -> repositories: repositories()
+                    JobApplicationManagementService -> JobApplicationRepository: jobApplicationRepository()
+                    JobApplicationManagementService -> JobApplicationRepository: jobApplications()
+                        activate JobApplicationRepository
+                        JobApplicationRepository --> JobApplicationManagementService: jobApplications
+                    deactivate JobApplicationRepository
+                    JobApplicationManagementService -> JobApplicationManagementService : jobApplicationsOfJobOpening(jobOpening)
+                        activate JobApplicationManagementService
+                    deactivate JobApplicationManagementService
+                    JobApplicationManagementService --> Controller: jobApplications
+                deactivate JobApplicationManagementService
+                Controller --> UI: jobApplications
+        deactivate Controller
+
+            UI -> UI: numberOfVacancies = jobOpening.numberOfVacancies()
+            activate UI
+        deactivate UI
+            UI -> UI: Map<Rank, JobApplication> ranks = new HashMap<>();
+            activate UI
+        deactivate UI
+
+        UI --> CM: Display list of job application
+            note right of CM
+                The candidates' information contains
+                their CV and interview grade (if exists)
+            end note
+    deactivate UI
+
+    loop until all candidates are ranked OR ranks.size() < numberOfVacancies
+        CM -> UI: Selects a application
+            activate UI
+            UI -> CM: Display candidates information?
+        deactivate UI
+        alt Yes
+            CM -> UI: Yes
+                activate UI
+                UI -> CM: Display candidate information
+        end alt
+
+        UI -> CM: Request position
+        deactivate UI
+        CM -> UI : Ranks the candidate with rank = true
+            activate UI
+                UI -> UI: stores it in ranks
+                activate UI
+            deactivate UI
+            UI --> CM: Confirmation message
+        deactivate UI
+
+    end loop
+
+    CM -> UI: Saves the ranking
+
+        activate UI
+        UI -> Controller: saveRanks(jobOpening, ranks)
+            activate Controller
+            Controller -> JobOpeningManagementService: saveRanks(jobOpening, ranks)
+                activate JobOpeningManagementService
+                JobOpeningManagementService -> repositories: repositories()
+                JobOpeningManagementService -> JobOpeningRepository: jobOpeningRepository()
+                JobOpeningManagementService -> JobOpeningRepository: saveRanks(jobOpening, ranks)
+                    activate JobOpeningRepository
+                    JobOpeningRepository --> JobOpeningManagementService: ranks saved
+                deactivate JobOpeningRepository
+                JobOpeningManagementService --> Controller: ranks saved
+            deactivate JobOpeningManagementService
+            Controller --> UI: job opening rank lists saved
+        deactivate Controller
+
+        loop all job applications
+            alt ranks.get(jobApplication).ranked() == true
+            UI -> UI : rank = ranks.get(jobApplication).rank()
+                activate UI
+            deactivate UI
+            UI -> Controller: saveJobApplicationRank(jobApplication, rank)
+                activate Controller
+                Controller -> JobApplicationManagementService: saveJobApplicationRank(jobApplication, rank)
+                    activate JobApplicationManagementService
+                    JobApplicationManagementService -> repositories: repositories()
+                    JobApplicationManagementService -> repositories: jobApplicationRepository()
+                        alt rank > -1
+                            JobApplicationManagementService -> JobApplicationRepository : jobApplication.saveRank(rank)
+                                activate JobApplicationRepository
+                                JobApplicationRepository --> JobApplicationManagementService: jobApplication rank saved
+                            deactivate JobApplicationRepository
+                        end alt
+                        JobApplicationManagementService --> Controller: jobApplication rank saved
+                    deactivate JobApplicationManagementService
+                Controller --> UI: jobApplication rank saved
+            deactivate Controller
+            else ranks.get(jobApplication) == false
+            UI -> Controller: saveJobApplicationRank(jobApplication, -1)
+                activate Controller
+                Controller -> JobApplicationManagementService: saveJobApplicationRank(jobApplication, -1)
+                    activate JobApplicationManagementService
+                    JobApplicationManagementService -> repositories: repositories()
+                    JobApplicationManagementService -> repositories: jobApplicationRepository()
+                        alt rank == -1
+                        JobApplicationManagementService -> JobApplicationRepository : jobApplication.saveRank()
+                            activate JobApplicationRepository
+                            JobApplicationRepository --> JobApplicationManagementService: jobApplication rank saved
+                        deactivate JobApplicationRepository
+                        end alt
+                        JobApplicationManagementService --> Controller: jobApplication rank saved
+                    deactivate JobApplicationManagementService
+                Controller --> UI: jobApplication rank saved
+                deactivate Controller
+            end alt
+        end loop
+
+    UI --> CM: Ranking saved
+    deactivate UI
+
+@enduml

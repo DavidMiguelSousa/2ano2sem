@@ -1,0 +1,41 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor Operator as Actor
+participant ":System" as System
+
+activate Actor
+    Actor -> System: Login
+    activate System
+
+        System -> System: Validate login
+
+        System --> Actor: Allow access to the backoffice application with customer manager permissions
+    deactivate System
+
+    Actor -> System: Select the option to generate and export a template text file with candidate answers during an interview.
+    activate System
+
+    loop while customer manager wants to add questions
+            System --> Actor: Ask for question type, after showing a list of available question types
+        deactivate System
+
+        Actor -> System: Select the question type
+        activate System
+
+            System --> Actor: Ask for the question text
+        deactivate System
+
+        Actor -> System: Enter the question text
+        activate System
+
+            System --> Actor: Ask if he wants to add another question
+        deactivate System
+    end
+    activate System
+        System -> System: Create the file with the questions and answers
+    deactivate System
+deactivate Actor
+@enduml

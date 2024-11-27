@@ -1,0 +1,4 @@
+INTERVIEW "Time example-2"
+
+TIMEQUES [HH:MM] "How long is 135 minutes?" [10];
+SOL <2:15|1>;

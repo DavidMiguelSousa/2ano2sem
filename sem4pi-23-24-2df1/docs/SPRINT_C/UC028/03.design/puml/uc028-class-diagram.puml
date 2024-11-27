@@ -1,0 +1,67 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title Class Diagram (CD) - UC028
+
+class RecordInterviewTimestampUI {
+}
+
+class RecordInterviewTimestampController {
+  +jobOpenings()
+  +jobApplicationsByJobOpening(jobOpening)
+  +recordInterviewTimestamp(jobApplication, timestamp)
+  -ensureAuthenticatedUserHasAnyOf(role)
+  -authenticatedUser()
+}
+
+class AuthorizationService {
+  +ensureAuthenticatedUserHasAnyOf(role)
+}
+
+class UserSession {
+  +authenticatedUser()
+}
+
+class JobOpeningManagementService {
+  +findAll()
+}
+
+class JobApplicationManagementService {
+  +findJobApplicationsByJobOpening(jobOpening)
+  +recordInterviewTimestamp(jobApplication, timestamp)
+}
+
+class PersistenceContext {
+  +repositories()
+}
+
+class RepositoryFactory {
+  +jobOpenings()
+}
+
+class JobOpeningRepository {
+  +findAllActive()
+}
+
+class JobApplicationRepository {
+  +findJobApplicationsByJobOpening(jobOpening)
+  +update(jobApplication)
+}
+
+CustomerManager --> RecordInterviewTimestampUI
+RecordInterviewTimestampUI --> RecordInterviewTimestampController: controller
+RecordInterviewTimestampController --> AuthorizationService: authz
+RecordInterviewTimestampController --> UserSession: session
+RecordInterviewTimestampController --> JobOpeningManagementService: service
+RecordInterviewTimestampController --> JobApplicationManagementService: service
+JobOpeningManagementService --> JobOpeningRepository: repository
+JobApplicationManagementService --> JobApplicationRepository: repository
+AuthorizationService --> UserSession: session
+JobOpeningManagementService --> PersistenceContext: persistence
+PersistenceContext --> RepositoryFactory: factory
+RepositoryFactory --> JobOpeningRepository: repository
+RepositoryFactory --> JobApplicationRepository: repository
+JobApplicationManagementService -> PersistenceContext: persistence
+
+@enduml

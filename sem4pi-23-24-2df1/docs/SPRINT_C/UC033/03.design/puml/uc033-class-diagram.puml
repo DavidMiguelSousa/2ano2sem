@@ -1,0 +1,50 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC001
+
+class ListJobOpeningsInterviewGradesUI <<interface>>
+
+class ListJobOpeningsInterviewGradesController <<controller>>
+
+class JobOpeningManagementService <<service>>
+
+class JobApplicationManagementService <<service>>
+
+class JobOpeningRepository <<repository>>
+
+class JobApplicationRepository <<repository>>
+
+class RepositoryFactory <<factory>>
+
+class JobOpening <<entity>>
+
+class JobApplication <<entity>>
+
+class Interview <<value object>>
+
+class InterviewGrade <<value object>>
+
+ListJobOpeningsInterviewGradesUI ..> ListJobOpeningsInterviewGradesController
+
+ListJobOpeningsInterviewGradesController ..> JobOpeningManagementService : uses >
+ListJobOpeningsInterviewGradesController ..> JobApplicationManagementService : uses >
+ListJobOpeningsInterviewGradesController ..> JobOpeningRepository : accesses >
+ListJobOpeningsInterviewGradesController ..> JobApplicationRepository : accesses >
+
+JobOpeningRepository <.. RepositoryFactory : creates <
+JobOpeningRepository ..> JobOpening : obtains it from the database >
+
+JobApplicationRepository <.. RepositoryFactory : creates <
+JobApplicationRepository ..> JobApplication : obtains it from the database >
+
+JobOpening "1" --> "*" JobApplication : has >
+
+JobApplication "1" --> "1" Interview : has >
+
+JobApplication "1" --> "1" InterviewGrade : has >
+
+@enduml

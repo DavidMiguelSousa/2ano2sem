@@ -1,0 +1,75 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC032
+
+class EvaluateJobOpeningInterviewsUI <<interface>>
+
+class EvaluateJobOpeningInterviewsController <<controller>>
+
+class JobOpeningManagementService <<service>>
+
+class JobApplicationManagementService <<service>>
+
+class InterviewManagementService <<service>>
+
+class JobOpeningRepository <<repository>>
+
+class JobApplicationRepository <<repository>>
+
+class RepositoryFactory <<factory>>
+
+class InterviewModelParser <<parser>>
+
+class InterviewVisitor <<visitor>>
+
+class JobOpening <<entity>>
+
+class JobApplication <<entity>>
+
+class InterviewGrade <<value object>>
+
+enum Phases <<value object>> {
+    APPLICATION
+    SCREENING
+    INTERVIEW
+    ANALYSIS
+    RESULT
+}
+
+class Interview <<value object>>
+
+
+EvaluateJobOpeningInterviewsUI ..> EvaluateJobOpeningInterviewsController
+
+EvaluateJobOpeningInterviewsController ..> JobOpeningManagementService : uses >
+EvaluateJobOpeningInterviewsController ..> JobApplicationManagementService : uses >
+EvaluateJobOpeningInterviewsController ..> InterviewManagementService : uses
+
+EvaluateJobOpeningInterviewsController ..> JobOpeningRepository : accesses >
+EvaluateJobOpeningInterviewsController ..> JobApplicationRepository : accesses >
+
+JobOpeningManagementService --> JobOpeningRepository : uses
+JobApplicationManagementService --> JobApplicationRepository : uses
+InterviewManagementService --> InterviewModelParser : uses
+
+InterviewModelParser --> InterviewVisitor : uses >
+InterviewModelParser  ..> Interview : uses >
+InterviewVisitor --> Interview : analyzes >
+
+JobOpeningRepository <.. RepositoryFactory : creates <
+JobApplicationRepository <.. RepositoryFactory : creates <
+
+JobOpeningRepository ..> JobOpening : obtain job opening from database >
+JobApplicationRepository ..> JobApplication : updates interview grade in database >
+
+JobOpening "1" --> "4..5" Phases : has
+
+JobApplication "1" --> "1" InterviewGrade : has
+JobApplication "1" --> "1" Interview : has
+
+
+@enduml

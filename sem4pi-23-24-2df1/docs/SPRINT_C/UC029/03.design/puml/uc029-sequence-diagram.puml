@@ -1,0 +1,200 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title Sequence Diagram (SSD) - UC029
+
+actor "Customer Manager" as CM
+participant "VerifyJobOpeningsRequirementsUI" as UI
+participant "VerifyJobOpeningsRequirementsController" as Controller
+participant "JobOpeningManagementService" as jobOpeningService
+participant "JobApplicationManagementService" as jobApplicationService
+participant "JobRequirementsManagementService" as jobRequirementsService
+participant "JobRequirementsParser" as jobRequirementsParser
+participant "JobRequirementsVisitor" as jobRequirementsVisitor
+participant "repositories:Repositories" as repositories
+database "JobOpeningRepository" as jobOpeningRepository
+database "JobApplicationRepository" as jobApplicationRepository
+
+autonumber 1
+
+activate CM
+CM -> UI: Requests to verify a job opening's requirements
+    activate UI
+    UI -> Controller: jobOpeningsWithApplicationPhase();
+        activate Controller
+        Controller -> repositories : repositories();
+        Controller -> repositories: jobOpeningRepository();
+            activate repositories
+            repositories --> Controller: jobOpeningRepository
+        deactivate repositories
+        Controller -> jobOpeningService: new JobOpeningManagementService(jobOpeningRepository)
+        Controller -> jobOpeningService: jobOpeningsWithApplicationPhase();
+            activate jobOpeningService
+            jobOpeningService -> jobOpeningService: Iterable<JobOpening> jobOpenings = jobOpeningWithPhaseOn(Phase.APPLICATION);
+                activate jobOpeningService
+            deactivate jobOpeningService
+            loop JobOpening jobOpening : jobOpenings
+                alt !jobOpening.phase().contains(Phase.APPLICATION)
+                    jobOpeningService -> jobOpeningService: jobOpenings.remove(jobOpening)
+                end alt
+            end loop
+            jobOpeningService --> Controller: returns jobOpeningList = Iterable<JobOpening>
+        deactivate jobOpeningService
+        Controller --> UI: returns jobOpeningList = Iterable<JobOpening>
+    deactivate Controller
+    UI --> CM: Display job opening's list
+deactivate UI
+
+CM -> UI: Select one job opening to verify requirements
+    activate UI
+    UI -> Controller: jobApplicationsOf(jobOpening);
+        activate Controller
+        Controller -> repositories: repositories();
+        Controller -> repositories: jobApplicationRepository();
+            activate repositories
+            repositories --> Controller: jobApplicationRepository
+        deactivate repositories
+        Controller -> jobApplicationService: new JobApplicationManagementService(jobApplicationRepository)
+        Controller -> jobApplicationService: jobApplicationsOf(jobOpening);
+            activate jobApplicationService
+            jobApplicationService --> Controller: returns jobApplicationList = Iterable<JobApplication>
+        deactivate jobApplicationService
+        Controller --> UI: returns jobApplicationList = Iterable<JobApplication>
+    deactivate Controller
+
+    UI -> Controller: verifyJobRequirements(jobApplicationList, jobOpening)
+        activate Controller
+        Controller -> jobRequirementsService: verifyJobRequirements(jobApplicationList, jobOpening)
+            activate jobRequirementsService
+            jobRequirementsService -> jobRequirementsParser: new JobRequirementsParser()
+
+            jobRequirementsService -> jobRequirementsService : Path pathJobRequirements = Paths.get("LPROG/jobRequirements/" + jobOpening.jobRequirements().identity().toString().replace(" ", "") + ".txt");
+                activate jobRequirementsService
+            deactivate jobRequirementsService
+
+            jobRequirementsService -> jobRequirementsParser: visitJobRequirements(pathJobRequirements)
+                activate jobRequirementsParser
+                jobRequirementsParser -> jobRequirementsVisitor: new JobRequirementsVisitor()
+                jobRequirementsParser -> jobRequirementsVisitor: visitJobRequirements(jobRequirements)
+                    activate jobRequirementsVisitor
+                    jobRequirementsVisitor -> jobRequirementsVisitor : //TODO
+                    jobRequirementsVisitor -> jobRequirementsParser : questionsWithSolution
+                deactivate jobRequirementsVisitor
+                jobRequirementsParser --> jobRequirementsService: questionsWithSolution
+            deactivate jobRequirementsParser
+
+            jobRequirementsService -> jobRequirementsService: boolean allAccepted = true;
+                activate jobRequirementsService
+            deactivate jobRequirementsService
+
+
+
+            jobRequirementsService -> jobRequirementsService : Map<JobApplication, InterviewGrade> grades = new HashMap<>();
+                activate jobRequirementsService
+            deactivate jobRequirementsService
+            loop jobApplicationList
+                jobRequirementsService -> jobRequirementsService :                 Path pathRequirements = Paths.get("SCOMP/files/fileBotFiles/" + jobOpening.identity()+ "/"+ jobApplication.candidate().email() + "/requirements.txt");
+                    activate jobRequirementsService
+                deactivate jobRequirementsService
+                jobRequirementsService -> jobRequirementsVisitor : visitJobRequirements(pathRequirements)
+                    activate jobRequirementsVisitor
+                    jobRequirementsVisitor -> jobRequirementsVisitor : //TODO
+                    jobRequirementsVisitor -> jobRequirementsService : questionsWithAnswer
+                deactivate jobRequirementsVisitor
+
+
+
+                loop qs : questionsWithSolution
+                    loop qa : questionsWithAnswer
+                        alt qs.question().equals(qa.question()) && allAccepted
+                            alt qs.type() == RequirementType.MININT
+                                jobRequirementsService -> jobRequirementsService : allAccepted = evaluateMinInt(qs.type(), qs, qa);
+                                    activate jobRequirementsService
+                                deactivate jobRequirementsService
+                            else qs.type() == RequirementType.MAXINT
+                                jobRequirementsService -> jobRequirementsService : allAccepted = evaluateMaxInt(qs.type(), qs, qa);
+                                    activate jobRequirementsService
+                                deactivate jobRequirementsService
+
+                            else qs.type() == RequirementType.MINORD
+                                jobRequirementsService -> jobRequirementsService : allAccepted = evaluateMinOrd(qs.type(), qs, qa);
+                                    activate jobRequirementsService
+                                deactivate jobRequirementsService
+
+                              else qs.type() == RequirementType.MAXORD
+                                  jobRequirementsService -> jobRequirementsService : allAccepted = evaluateMaxOrd(qs.type(), qs, qa);
+                                      activate jobRequirementsService
+                                  deactivate jobRequirementsService
+
+                              else qs.type() == RequirementType.MULORSING
+                             jobRequirementsService -> jobRequirementsService : allAccepted = evaluateMulOrSing(qs.type(), qs, qa);
+                                 activate jobRequirementsService
+                             deactivate jobRequirementsService
+
+                            end alt
+                        end alt
+                    end loop
+                end loop
+
+                alt allAccepted
+
+                jobRequirementsService -> jobRequirementsService: jobApplication.accept();
+
+                    activate jobRequirementsService
+                deactivate jobRequirementsService
+                else !allAccepted
+                    jobRequirementsService -> jobRequirementsService: jobApplication.refused();
+                    activate jobRequirementsService
+                deactivate jobRequirementsService
+                end alt
+
+                jobRequirementsService -> jobRequirementsService : requirements.add(jobApplication);
+                    activate jobRequirementsService
+                deactivate jobRequirementsService
+            end loop
+            jobRequirementsService -->  Controller: application requirements
+        deactivate jobRequirementsService
+        Controller --> UI: application requirements
+    deactivate Controller
+
+    UI --> CM: Display application requirements
+    UI --> CM: Save application requirements?
+    deactivate UI
+
+    alt confirm
+    CM -> UI: Confirms to save application requirements
+        activate UI
+        UI -> Controller: saveRequirements(requirements)
+            activate Controller
+            Controller -> jobApplicationService: saveRequirements(requirements)
+                activate jobApplicationService
+                loop requirements
+                    jobApplicationService -> jobApplicationService: jobApplication = jobApplication.identity()
+                        activate jobApplicationService
+                    deactivate jobApplicationService
+                    jobApplicationService -> jobApplicationService: jobApplication.status()
+                        activate jobApplicationService
+                    deactivate jobApplicationService
+                    jobApplicationService -> jobApplicationService: jobApplication.saveRequirements(requirements);
+                        activate jobApplicationService
+                    deactivate jobApplicationService
+                    jobApplicationService -> jobApplicationRepository: jobApplicationRepository.save(jobApplication);
+                        activate jobApplicationRepository
+                        jobApplicationRepository --> jobApplicationRepository: save(jobApplication)
+                        jobApplicationRepository --> jobApplicationService: returns (un)successful
+                    deactivate jobApplicationRepository
+                end loop
+                jobApplicationService --> Controller: returns (un)successful
+            deactivate jobApplicationService
+            Controller --> UI: returns (un)successful
+
+    else cancel
+    CM -> UI: Cancels to save interview's grades
+    end alt
+    UI --> CM: Shows (un)successful message
+    deactivate UI
+deactivate CM
+
+@enduml

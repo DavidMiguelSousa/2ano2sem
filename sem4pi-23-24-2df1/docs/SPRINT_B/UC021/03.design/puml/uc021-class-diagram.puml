@@ -1,0 +1,32 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+hide methods
+
+title Class Diagram (CD) - UC021
+
+class GenerateJobRequirementsUI {
+}
+
+class GenerateJobRequirementsController {
+}
+
+class JobRequirementsManagementService {
+}
+
+class InterviewModel {
+}
+
+
+
+GenerateJobRequirementsUI .right-> GenerateJobRequirementsController
+
+GenerateJobRequirementsController .down-> JobRequirementsManagementService
+
+JobRequirementsManagementService -down-> InterviewModel
+
+
+@enduml

@@ -1,0 +1,55 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC021
+
+actor Operator as Actor
+participant GenerateJobRequirementsUI as UI <<presentation>>
+participant GenerateJobRequirementsController as Controller <<application>>
+participant JobRequirementsManagementService as Service <<service>>
+
+Actor -> UI: Generate Job Requirements
+activate UI
+
+    UI --> Actor: Ask for Interview Model Name
+
+    Actor -> UI: Job Requirements Name
+
+    UI -> Controller: createFile()
+    activate Controller
+
+        Controller -> Service: createFile()
+        activate Service
+
+            Service --> Controller: fileCreated
+        deactivate Service
+
+        Controller --> UI: fileCreated
+    deactivate Controller
+
+    UI --> Actor: Ask for question details
+
+    Actor -> UI: Writes question
+
+    loop while (more questions) is (true)
+        UI -> Controller: appendQuestion()
+        activate Controller
+
+            Controller -> Service: appendQuestion()
+            activate Service
+
+                Service --> Controller: questionAppended
+            deactivate Service
+
+            Controller --> UI: questionAppended
+        deactivate Controller
+    end
+
+    UI --> Actor: (in)success of the operation
+
+deactivate UI
+@enduml

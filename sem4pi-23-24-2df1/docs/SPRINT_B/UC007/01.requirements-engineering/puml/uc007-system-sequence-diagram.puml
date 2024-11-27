@@ -1,0 +1,24 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC007
+actor CustomerManager as CM
+
+
+activate CM
+   CM -> ":System" : asks to  list job openings.
+activate ":System"
+
+         alt successful case
+
+             ":System" --> CM: display list of job openings
+             else failure case
+             ":System" --> CM: display error message
+
+         end
+     deactivate ":System"
+
+
+@enduml

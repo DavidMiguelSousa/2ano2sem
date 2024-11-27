@@ -1,0 +1,10 @@
+JOB REQUIREMENTS "Example 1"
+
+MININT "Enter the number of years of experience (integer).";
+Answer: 5
+
+MINORD  "Select one degree (None; Bachelor; Master; PhD)";
+Answer: PhD
+
+MULORSING "Select one or more programming languages you're proficient in (java; javascript; python)";
+Answer: java,javascript

@@ -1,0 +1,11 @@
+INTERVIEW "Example-2"
+
+MCQUES "Which of the following are core tasks in the field of informatics?" [10];
+1-OPT Developing algorithms to process and analyze data;
+2-OPT Implementing security measures for information systems;
+3-OPT Marketing new software products;
+4-OPT Repairing hardware components like hard drives;
+5-OPT Designing electrical circuits;
+SOL <1|0.8>;
+SOL <2|0.6>;
+SOL <1, 2|1>;

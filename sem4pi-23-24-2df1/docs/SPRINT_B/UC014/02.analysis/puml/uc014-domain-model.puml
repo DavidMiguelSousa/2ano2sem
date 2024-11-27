@@ -1,0 +1,72 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+left to right direction
+
+title Domain Model (DM) - UC014
+
+class SystemUserBuilder <<factory>>
+
+package SystemUserAggregate {
+
+    class Email <<value>>
+
+    class SystemUser <<root>>
+
+    class Password <<value>>
+
+    class Name <<value>>
+
+    class RoleSet <<value>>
+
+    class RoleAssignment <<entity>>
+
+    class Role <<value>>
+
+    class Set<RoleAssignment> <<value>>
+
+}
+
+package CandidateAggregate {
+
+    class Candidate <<root>>
+
+}
+
+note bottom of Candidate : Candidate is not a software class since all SystemUser are considered candidates
+
+package PhoneNumberAggregate {
+    class PhoneNumber <<Root Entity>>
+    class PhoneIndicative <<Value Object>>
+}
+
+class PasswordPolicy <<service>>
+
+class PasswordEncoder <<service>>
+
+SystemUserBuilder ..> SystemUser
+
+SystemUser "1" -- "1" Name
+SystemUser "1" -- "1" Email
+SystemUser "1" -- "1" Password
+SystemUser <- Candidate
+SystemUser --> RoleSet
+
+RoleSet --|> Set
+RoleSet ..> RoleAssignment
+Role <-- RoleAssignment
+
+Password "1" -. "1" PasswordEncoder
+Password "1" -. "1" PasswordPolicy
+
+Candidate "1" -- "1" PhoneNumber
+
+PhoneNumber "1" -- "1" PhoneIndicative
+
+@enduml

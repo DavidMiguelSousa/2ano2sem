@@ -1,0 +1,7 @@
+JOB REQUIREMENTS "Java Programmer"
+
+# Enter the number of years of experience (integer)
+
+# Select one degree (None; Bachelor; Master; PhD)
+
+# Select one or more programming languages you're proficient in (java; javascript; python)

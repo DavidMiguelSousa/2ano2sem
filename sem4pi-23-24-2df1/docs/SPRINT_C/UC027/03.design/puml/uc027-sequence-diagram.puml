@@ -1,0 +1,304 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+autonumber 0
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC027
+
+actor CustomerManager as CM
+participant ClosePhasesJobOpeningUI as UI <<presentation>>
+participant OpenClosePhasesJobOpeningController as Controller <<application>>
+participant ": JobOpeningManagementService" as Service  <<service>>
+participant ": AuthorizationService" as AuthService <<service>>
+participant RepositoryFactory as Factory <<factory>>
+database JobOpeningRepository as Repository <<repository>>
+
+activate CM
+
+    CM --> UI: Select the option to close the job opening
+    activate UI
+
+    UI -> Controller: create()
+
+       activate Controller
+
+            UI -> Controller : obtainJobOpeningsAvailable()
+
+
+                Controller -> Service : findAllAvailable()
+
+           activate Service
+
+                  Service -> AuthService : ensureAuthenticatedUserHasAnyOf()
+
+                    activate AuthService
+
+                        AuthService --> Service : (in)success authentication
+
+                    deactivate AuthService
+
+                  Service -> Repository : findAll()
+
+                    activate Repository
+
+                        Repository --> Service : list of job openings
+
+                    deactivate Repository
+
+                  Service --> Controller : list of job openings
+
+           deactivate Service
+
+            Controller --> UI : list of job openings
+
+            UI -> Controller : filterJobOpenings(List<JobOpening> jobOpenings)
+
+            loop for each job opening
+
+                alt if jobOpening.phases.isEmpty()
+
+                    Controller -> Controller : addList(jobOpening)
+
+                end if
+            end
+
+            Controller --> UI : list of job openings
+
+       deactivate Controller
+
+    UI -> CM: show list of job openings.
+
+    deactivate UI
+
+
+        CM -> UI: Select the job opening to close
+
+    activate UI
+
+        UI --> CM: Display job opening phases
+    deactivate UI
+
+    alt if close the phase
+
+        CM -> UI: Select the phase to be closed
+
+        activate UI
+
+                UI -> Controller: closePhase()
+
+                activate Controller
+
+                Controller -> Controller : findCurrentPhase(Map<Phase, PhaseDetails> phasesMap)
+
+
+
+                        alt if currentPhase == PhasesStatus.RESULT
+
+                                Controller -> Service : updatePhases(jobOpening, currentPhase, Status.COMPLETED);
+
+                                activate Service
+
+                                    Service -> Factory : repositories()
+
+                                        activate Factory
+
+                                            Factory --> Service : jobOpeningRepository
+
+                                        deactivate Factory
+
+                                        Service -> Repository : updatePhases(jobOpening, currentPhase, status)
+
+                                        activate Repository
+
+                                            Repository -> Repository : :OLD.phaseStatus := :NEW.phaseStatus
+                                        activate Repository
+                                            deactivate Repository
+
+                                        Repository --> Service : (in)success operation
+                                        deactivate Repository
+
+                                        Service --> Controller : (in)success operation
+
+                                deactivate Service
+
+
+                                else if currentPhase != PhasesStatus.RESULT
+
+                                Controller -> Service : updatePhases(jobOpening, currentPhase, Status.COMPLETED)
+
+                             activate Service
+
+                                Service -> Factory : repositories()
+
+                                    activate Factory
+
+                                        Factory --> Service : jobOpeningRepository
+
+                                    deactivate Factory
+
+                                    Service -> Repository : updatePhases(jobOpening, currentPhase, status)
+                                    activate Repository
+
+                                        Repository -> Repository : :OLD.phaseStatus := :NEW.phaseStatus
+                                    activate Repository
+                                        deactivate Repository
+
+                                    Repository --> Service : (in)success operation
+                                    deactivate Repository
+
+                                    Service --> Controller : (in)success operation
+
+
+                            deactivate Service
+
+                                Controller -> Controller : findNextPhase(phrase)
+
+                                Controller -> Service : updatePhases(jobOpening, nextPhase, Status.COMPLETED)
+
+                            activate Service
+
+                                Service -> Factory : repositories()
+
+                                    activate Factory
+
+                                        Factory --> Service : jobOpeningRepository
+
+                                    deactivate Factory
+
+                                    Service -> Repository : updatePhases(jobOpening, nextPhase, status);
+                                    activate Repository
+
+                                        Repository -> Repository : :OLD.phaseStatus := :NEW.phaseStatus
+                                    activate Repository
+                                        deactivate Repository
+
+                                    Repository --> Service : (in)success operation
+                                    deactivate Repository
+
+                                    Service --> Controller : (in)success operation
+
+                             deactivate Service
+
+
+                        end alt
+                        Controller --> UI : (in)success operation
+
+                deactivate Controller
+
+            UI -> CM: phase closed successfully
+
+        deactivate UI
+
+    else Go back to the previous phase
+
+            CM -> UI: Select the option to return to the previous phase
+
+            activate UI
+
+                UI -> Controller: closePhase()
+                activate Controller
+
+                    Controller -> Controller : findCurrentPhase(phrase)
+
+                    alt if previousPhase!=null
+
+                        alt if currentPhase = IN_PROGRESS
+
+                        Controller -> Service : updatePhases(jobOpening, currentPhase, Status.COMPLETED)
+
+                         activate Service
+
+                            Service -> Factory : repositories()
+
+                                activate Factory
+
+                                    Factory --> Service : jobOpeningRepository
+
+                                deactivate Factory
+
+                                Service -> Repository : updatePhases(jobOpening, currentPhase, status)
+                                activate Repository
+
+                                    Repository -> Repository : :OLD.phaseStatus := :NEW.phaseStatus
+                                activate Repository
+                                    deactivate Repository
+
+                                Repository --> Service : (in)success operation
+                                deactivate Repository
+
+                                Service --> Controller : (in)success operation
+
+                                Controller -> Service : updatePhases(jobOpening, previousPhase, Status.IN_PROGRESS)
+
+                                Service -> Repository : updatePhases(jobOpening, previousPhase, status)
+                                activate Repository
+
+                                    Repository -> Repository : :OLD.phaseStatus := :NEW.phaseStatus
+                                activate Repository
+                                    deactivate Repository
+
+                                Repository --> Service : (in)success operation
+
+                                deactivate Repository
+
+                                Service --> Controller : (in)success operation
+
+                        deactivate Service
+
+                        else if currentPhase = PENDING
+
+                            Controller -> Service : updatePhases(jobOpening, currentPhase, Status.COMPLETED)
+
+                        activate Service
+
+                            Service -> Factory : repositories()
+
+                                activate Factory
+
+                                    Factory --> Service : jobOpeningRepository
+
+                                deactivate Factory
+
+                                Service -> Repository : updatePhases(jobOpening, currentPhase, status)
+                                activate Repository
+
+                                    Repository -> Repository : :OLD.phaseStatus := :NEW.phaseStatus
+                                activate Repository
+                                    deactivate Repository
+
+                                Repository --> Service : (in)success operation
+                                deactivate Repository
+
+                        Service --> Controller : (in)success operation
+
+                        deactivate Service
+
+                        end if
+
+                    end if
+
+                        Controller --> UI : (in)success message
+
+                deactivate Controller
+
+                    UI -> CM: phase moved back to the previous successfully
+
+
+
+    end alt
+
+    alt if allPhases = Status.COMPLETED
+
+        UI --> CM: Job opening completed successfully
+
+    end
+
+            deactivate UI
+
+    deactivate CM
+
+
+@enduml

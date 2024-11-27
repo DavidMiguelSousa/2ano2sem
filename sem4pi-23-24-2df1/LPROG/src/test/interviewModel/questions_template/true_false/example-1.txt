@@ -1,0 +1,4 @@
+INTERVIEW "True False example-1"
+
+TFQUES [TRUE|FALSE] "Informatics engineering exclusively focuses on creating software applications." [10];
+SOL <FALSE|1>;

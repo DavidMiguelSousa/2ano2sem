@@ -1,0 +1,109 @@
+@startuml
+
+
+actor Operator as Operator
+
+participant AddUserUI as ui <<presentation>>
+participant AddUserController as controller <<controller>>
+participant AuthenticationService as authz <<service>>
+participant UserSession as session <<session>>
+participant UserManagementService as service <<service>>
+participant SystemUserBuilder as builder <<service>>
+participant SystemUser as domain
+participant PersistenceContext as context <<persistence>>
+participant RepositoryFactory as factory <<factory>>
+database UserRepository as repository <<repository>>
+
+    Operator --> ui: Add User
+    activate ui
+
+    ui -> controller: create()
+
+    activate controller
+    controller -> authz: create()
+
+    controller -> authz: ensureAuthenticatedUserHasAnyOf(BaseRoles.OPERATOR)
+    activate authz
+
+    authz -> session: create()
+
+    controller -> authz : session()
+
+    authz -> controller : session
+    deactivate authz
+
+    controller -> session : authenticatedUser()
+    activate session
+
+    session -> controller : user
+    deactivate session
+
+    controller -> ui : user
+    deactivate controller
+
+    ui --> Operator: Show candidate role (no role)
+
+    Operator --> ui: Select role
+
+    ui --> Operator: Ask user information
+
+    Operator --> ui: Input data
+
+    ui -> controller: addUser()
+    activate controller
+
+    controller -> service: create()
+    activate service
+
+    controller -> service: registerNewUser()
+
+    service -> builder: create()
+    activate builder
+
+    service -> builder: with(username, rawPassword, firstName, lastName, email)
+    service -> builder: createdOn(createdOn)
+    service -> builder: withRoles(roles)
+
+    service -> builder: build()
+
+    builder -> domain: SystemUser()
+    activate domain
+    domain -> domain: validateParameters()
+
+    domain -> builder: user
+    deactivate domain
+
+    builder -> service: user
+    deactivate builder
+
+    service -> context: repositories()
+    activate context
+
+    context -> factory: create()
+
+    context -> service: factory
+    deactivate context
+
+    service -> factory: users()
+    activate factory
+
+    factory -> repository: create()
+    factory -> service: userRepository
+    deactivate factory
+
+    service -> repository:save(user)
+    activate repository
+
+    repository -> service:user
+    deactivate repository
+
+    service -> controller:user
+    deactivate service
+
+    controller -> ui:user
+    deactivate controller
+
+    ui --> Operator: Display success message
+    deactivate ui
+
+@enduml

@@ -1,0 +1,4 @@
+INTERVIEW "Short-answer example-2"
+
+SAQUES [Text] "What's the special character used in a email address?" [10];
+SOL <@|1>;

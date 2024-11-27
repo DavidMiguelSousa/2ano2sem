@@ -1,0 +1,54 @@
+@startuml
+
+title System Sequence Diagram - UC008
+actor Operator as Operator
+participant ":System" as System
+
+activate Operator
+
+    Operator -> System : Register a candidate
+    activate System
+
+    System --> Operator : Asks for first and last name
+    deactivate System
+
+    Operator -> System : Inputs name
+    activate System
+
+    System --> Operator : Asks for email
+    deactivate System
+
+    Operator -> System : Inputs email
+    activate System
+
+    System --> Operator : Asks for phone number
+    deactivate System
+
+    Operator -> System : Inputs phone number
+    activate System
+
+    System -> System : Validates data
+    alt success
+    activate System
+
+    System --> System
+    deactivate System
+
+    System -> System : Generate user password
+    activate System
+
+    System --> System
+    deactivate System
+
+        alt Success
+        System --> Operator : Informs the candidate was registered and user created
+        else Error
+        System --> Operator : Informs error occurred
+        deactivate System
+
+        end alt
+
+deactivate Operator
+
+
+@enduml

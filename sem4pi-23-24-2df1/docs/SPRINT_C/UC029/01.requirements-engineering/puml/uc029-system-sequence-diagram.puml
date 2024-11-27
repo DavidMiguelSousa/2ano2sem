@@ -1,0 +1,52 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC029
+actor "Customer Manager" as CM
+participant ":System" as System
+
+autonumber 1
+
+activate CM
+CM -> System: Requests to verify a job opening's requirements
+        activate System
+    System -> System: Retrieve job opening's list
+        activate System
+    deactivate System
+    System -> System: Select job opening's with phase's application completed
+        activate System
+    deactivate System
+    System --> CM: Display job opening's list
+deactivate System
+CM -> System: Select one job opening to verify requirements
+    activate System
+    System -> System: Retrieve job opening's job applications
+        activate System
+    deactivate System
+    loop for each job application
+            System -> System: Retrieve job application's requirement's
+            activate System
+        deactivate System
+            System -> System: Retrieve requirement's
+            activate System
+        deactivate System
+    end loop
+    System --> CM: Display requirement's status
+    System --> CM: Save requirement's status?
+    deactivate System
+    alt confirm
+    CM -> System: Confirms to save requirement's status
+        activate System
+    System -> System: Save requirement's status
+        activate System
+    deactivate System
+    else cancel
+    CM -> System: Cancels to save requirement's status
+    end alt
+    System --> CM: Shows (un)successful message
+    deactivate System
+deactivate CM
+
+@enduml

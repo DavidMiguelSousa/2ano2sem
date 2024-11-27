@@ -1,0 +1,59 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC038
+
+class ListCandidateApplicationsUI <<presentation>>
+
+class ListCandidateApplicationsController <<controller>>
+
+class TcpService <<service>>
+
+class TcpChatCli <<service>>
+
+class TcpChatSrv <<service>>
+
+class RepositoryFactory <<factory>>
+
+class JobApplication <<root entity>>
+
+class JobApplicationReference <<value object>>
+
+class ApprovalStatus <<value object>>
+
+class JobApplicationRepository <<repository>>
+
+class JobOpening <<root entity>>
+
+class JobReference <<value object>>
+
+class CandidateRepository <<repository>>
+
+class Candidate <<root entity>>
+
+ListCandidateApplicationsUI ..> ListCandidateApplicationsController
+
+ListCandidateApplicationsController ..> TcpService : uses >
+
+TcpService ..> CandidateRepository : accesses >
+TcpService ..> JobApplicationRepository : accesses >
+
+JobApplicationRepository <.. RepositoryFactory : creates <
+JobApplicationRepository ...> JobApplication : saves in database >
+
+TcpService --> TcpChatCli : connects >
+TcpService --> TcpChatSrv : connects >
+
+CandidateRepository <.. RepositoryFactory : creates <
+CandidateRepository ...> Candidate : saves in database >
+
+JobApplication --> Candidate : submits <
+JobApplication --> JobApplicationReference : identified by >
+JobApplication --> ApprovalStatus : has >
+JobApplication --> JobOpening : to >
+
+JobOpening --> JobReference : identified by >
+@enduml

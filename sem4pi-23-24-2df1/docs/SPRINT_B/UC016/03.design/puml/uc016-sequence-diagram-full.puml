@@ -1,0 +1,150 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+autonumber 0
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC016
+'hide footbox
+actor "CustomerManager" as CM
+participant ": SetUpJobOpeningPhasesUI" as UI <<presentation>>
+participant ": SetUpJobOpeningPhasesController" as Controller <<application>>
+participant ": JobOpeningManagementService" as Service  <<service>>
+participant ": JobOpeningBuilder" as Builder <<factory>>
+entity "jobOpening :  JobOpening" as JobOpening <<entity>>
+participant RepositoryFactory as Factory <<factory>>
+database JobOpeningRepository as JobOpeningRepository <<repository>>
+
+activate CM
+CM -> UI : want to setup the phases of the job opening process
+
+    activate UI
+        UI -> Controller : obtainJobOpeningsAvailable()
+
+            activate Controller
+                Controller -> Service : findAll()
+
+                activate Service
+                    Service -> JobOpeningRepository : select all
+
+                    Service --> Controller : jobOpenings
+                deactivate Service
+
+                Controller --> UI : jobOpenings
+            deactivate Controller
+
+        UI --> CM: show list of job openings.
+
+    deactivate UI
+
+
+        CM -> UI : select a job opening
+
+        activate UI
+
+        UI --> CM: request date for Application's phase
+
+        deactivate UI
+
+        CM -> UI : enters dates
+
+        activate UI
+
+        UI --> CM: request date for Screening's phase
+
+        deactivate UI
+
+        CM -> UI : enters dates
+
+        activate UI
+
+        alt exists Interview
+
+            UI --> CM: request date for Interview's phase
+
+            CM -> UI : enters dates
+
+        end
+
+         UI --> CM: request date for Analysis' phase
+
+        deactivate UI
+
+        CM -> UI : enters dates
+
+        activate UI
+
+        UI --> CM: request date for Result's phase
+
+        deactivate UI
+
+        CM -> UI : enters dates
+
+        activate UI
+
+            UI -> UI: jobOpeningPhases  = new Map<Phases, Pair<Calendar, Calendar>> with the dates
+            activate UI
+            deactivate UI
+
+            UI -> Controller : setupPhases(jobOpening, jobOpeningPhases)
+            activate Controller
+
+                Controller -> Service: new JobOpeningManagmentService()
+
+                activate Service
+
+                    Service --> Controller : service
+
+                deactivate Service
+
+                Controller -> Service : setupPhases(jobOpening, jobOpeningPhases)
+
+                activate Service
+
+                    Service -> Builder : new Builder()
+
+                    activate Builder
+
+                        Builder --> Service : builder
+
+                    deactivate Builder
+
+                    Service -> Builder : builder.withSetupPhases(jobOpening, jobOpeningPhases)
+
+                    activate Builder
+
+                        Builder --> Service : jobOpening
+
+                    deactivate Builder
+
+                        Service -> Factory : repositories()
+
+                        activate Factory
+
+                            Factory --> Service : jobOpeningRepository
+
+                        deactivate Factory
+
+                        Service -> JobOpeningRepository : update(jobOpening)
+
+                        activate JobOpeningRepository
+
+                            JobOpeningRepository -> JobOpeningRepository : :OLD.jobOpeningPhases := :NEW.jobOpeningPhases
+                        activate JobOpeningRepository
+                        deactivate JobOpeningRepository
+
+                            JobOpeningRepository --> Service : (in)sucess operation
+                        deactivate JobOpeningRepository
+
+                    Service --> Controller : (in)sucess operation
+
+                deactivate Service
+
+                Controller --> UI : (in)sucess operation
+
+            deactivate Controller
+        UI --> CM: shows (in)sucess operation
+    deactivate UI
+
+@enduml

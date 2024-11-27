@@ -1,0 +1,11 @@
+INTERVIEW "Name"
+
+TFQUES [TRUE|FALSE] "Questao." [20];
+SOL <TRUE|1>;
+
+MCQUES [Options] "Outra questao." [20];
+1-OPT Carne;
+2-OPT Peixe;
+3-OPT Sopa;
+SOL <Carne, Sopa|1>;
+SOL <Carne|0,40>;

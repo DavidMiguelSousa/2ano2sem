@@ -1,0 +1,31 @@
+@startuml
+
+start
+:Start Application;
+
+:Initialize UI Components;
+:User Requests Word Count;
+
+fork;
+    :CountTopWordsUI Layer;
+    :Invoke CountTopWordsController;
+    fork
+        :CountTopWordsController Layer;
+        :Fetch Word Count Data;
+        :Use Word Aggregator to Process Data;
+        fork
+            :Domain Layer;
+            repeat
+            :WordCounter Processes Text;
+            repeat while (there are files for thread N?)
+            :TopWords & TopWordsFile Manage Results;
+        end fork
+    end fork
+end fork
+
+:Display Results on UI;
+:User Interaction Ends;
+
+stop
+
+@enduml

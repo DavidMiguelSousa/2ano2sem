@@ -1,0 +1,70 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC031
+actor CustomerManager as CM
+participant ":System" as System
+
+activate CM
+    CM -> System: Login
+    activate System
+
+        System -> System: Validate login
+
+        System --> CM: Allow access to the backoffice application with admin permissions
+    deactivate System
+
+    CM -> System: Want to upload a text file with the candidate responses
+    activate System
+
+        System --> CM: Display Job Opening list
+    deactivate System
+
+    CM -> System: Select a jobOpening
+    activate System
+
+            System --> CM: Display Job Application list according to selected job opening.
+    deactivate System
+
+    CM -> System: Select a jobApplication
+    activate System
+            System -> System : Export file interview
+
+            System --> CM: File (not)exported to downloads successfully
+
+
+        alt file exported successfully
+
+            System --> CM : File exported successfully and display if you want to import the file
+
+    deactivate System
+
+                alt if asnswer="Yes"
+
+                        CM -> System: Enter the file path to import
+
+                    activate System
+
+                        System -> System : Import file interview\nValidate the file\nSave in database
+
+                        System -> CM : File imported
+
+                else if asnswer="No"
+
+                    System -> CM : File not imported
+
+                end alt
+
+        else if file not exported successfully
+
+            System --> CM : File not exported successfully
+
+            deactivate System
+
+        end alt
+
+deactivate CM
+
+@enduml

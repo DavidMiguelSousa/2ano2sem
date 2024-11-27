@@ -1,0 +1,62 @@
+@startuml
+
+skinparam monochrome true
+skinparam packageStyle rect
+skinparam defaultFontName FG Virgil
+skinparam shadowing false
+
+class RegisterCandidateUI <<presentation>> {
+    doShow()
+    chooseRole()
+}
+
+class RegisterCandidateController <<application>> {
+    addUser()
+}
+
+class AuthorizationService <<service>> {
+    ensureAuthenticatedUserHasAnyOf(Role...)
+}
+
+class UserSession {
+    authenticatedUser()
+}
+
+class UserManagementService <<service>> {
+    registerNewUser()
+}
+
+class SystemUserBuilder <<builder>> {
+    with()
+    createdOn(Calendar)
+    withRoles()
+    build()
+}
+
+class "candidate:SystemUser" <<domain>> {
+    SystemUser()
+    validateParameters()
+}
+
+class PersistenceContext  <<persistence>> {
+    repositories()
+}
+class RepositoryFactory  <<factory>> {
+    users()
+}
+class UserRepository <<repository>> {
+    save(User)
+}
+
+RegisterCandidateUI --> RegisterCandidateController : the controller
+RegisterCandidateController --> AuthorizationService : authz
+RegisterCandidateController --> UserManagementService : service
+UserManagementService --> SystemUserBuilder : userBuilder
+SystemUserBuilder --> "candidate:SystemUser"
+AuthorizationService --> UserSession : session
+UserManagementService --> PersistenceContext : persistence
+PersistenceContext --> RepositoryFactory : factory
+RepositoryFactory --> UserRepository : repo
+UserManagementService --> UserRepository : repo
+
+@enduml

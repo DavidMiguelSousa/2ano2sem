@@ -1,0 +1,99 @@
+@startuml
+skinparam actorStyle awesome
+left to right direction
+title "Use Case Diagram"
+
+actor Admin
+actor CustomerManager
+actor Operator
+actor LanguageEngineer
+actor Customer
+actor Candidate
+
+usecase UC001 as "UC001 - Register Backoffice User"
+usecase UC002 as "UC002 - Enable Backoffice User"
+usecase UC003 as "UC003 - Disable Backoffice User"
+usecase UC004 as "UC004 - List Backoffice Users"
+usecase UC005 as "UC005 - Register Customer"
+usecase UC006 as "UC006 - Register Job Opening"
+usecase UC007 as "UC007 - List Job Openings"
+usecase UC008 as "UC008 - Register Candidate"
+usecase UC009 as "UC009 - List Candidates"
+usecase UC010 as "UC010 - Process Files Produced by Email Bot"
+usecase UC011 as "UC011 - Import Files Imported by Email Bot"
+usecase UC012 as "UC012 - Register an Application"
+usecase UC013 as "UC013 - List Applications for a Job Opening"
+usecase UC014 as "UC014 - List Candidate's Personal Data"
+usecase UC015 as "UC015 - List Candidate's Applications"
+usecase UC016 as "UC016 - Setup Phases for a Job Opening"
+usecase UC017 as "UC017 - Configure a Plugin"
+usecase UC018 as "UC018 - Select Interview Model for a Job Opening"
+usecase UC019 as "UC019 - Select Job Requirements for a Job Opening"
+usecase UC020 as "UC020 - Generate Template Text File for a Interview Model"
+usecase UC021 as "UC021 - Generate Template Text File for a Job Requirements Set"
+usecase UC022 as "UC022 - Rank Candidates for a Job Opening"
+usecase UC023 as "UC023 - Edit a Job Opening"
+usecase UC024 as "UC024 - Enable a Candidate"
+usecase UC025 as "UC025 - Disable a Candidate"
+usecase UC026 as "UC026 - Open Phase for a Job Opening"
+usecase UC027 as "UC027 - Close Phase for a Job Opening"
+usecase UC028 as "UC028 - Record Time and Date for a Interview"
+usecase UC029 as "UC029 - Verify Application Requirements for a Job Opening"
+usecase UC030 as "UC030 - Notify Candidate of Application Status"
+usecase UC031 as "UC031 - Upload Text File with Candidate Responses to a Interview"
+usecase UC032 as "UC032 - Evaluate (assign a grade to) Interview for a Job Opening"
+usecase UC033 as "UC033 - Get an Ordered List of Candidates with Grades for a Job Opening"
+usecase UC034 as "UC034 - Publish Results for a Selection of Candidates for a Job Opening"
+usecase UC035 as "UC035 - Notify Candidates and Customer of Interview Results"
+usecase UC036 as "UC036 - Display all Data of an Application"
+usecase UC037 as "UC037 - Upload a Text File with Candidate's Requirements for Verification"
+usecase UC038 as "UC038 - List Candidate Applications and their State (including Number of Applicants)"
+usecase UC039 as "UC039 - Notify Candidate of Application Status' Change"
+usecase UC040 as "UC040 - List Customer Job Openings including Job Reference, Position, Active Since and Number of Applicants"
+usecase UC041 as "UC041 - Notify Customer of Application Status' Change"
+usecase UC042 as "UC042 - Display Top 20 Words of Overall Applications' Text Files"
+
+Admin --> UC001
+Admin --> UC002
+Admin --> UC003
+Admin --> UC004
+CustomerManager --> UC005
+CustomerManager --> UC006
+CustomerManager --> UC007
+Operator --> UC008
+Operator --> UC009
+Operator --> UC010
+Operator --> UC011
+Operator --> UC012
+Operator --> UC013
+CustomerManager --> UC014
+CustomerManager --> UC015
+CustomerManager --> UC016
+LanguageEngineer --> UC017
+CustomerManager --> UC018
+CustomerManager --> UC019
+CustomerManager --> UC020
+CustomerManager --> UC021
+CustomerManager --> UC022
+CustomerManager --> UC023
+Operator --> UC024
+Operator --> UC025
+CustomerManager --> UC026
+CustomerManager --> UC027
+CustomerManager --> UC028
+CustomerManager --> UC029
+CustomerManager --> UC030
+CustomerManager --> UC031
+CustomerManager --> UC032
+CustomerManager --> UC033
+CustomerManager --> UC034
+CustomerManager --> UC035
+CustomerManager --> UC036
+Operator --> UC037
+Candidate --> UC038
+Candidate --> UC039
+Customer --> UC040
+Customer --> UC041
+CustomerManager --> UC042
+
+@enduml

@@ -1,0 +1,32 @@
+@startuml
+
+start
+:Initialize Config;
+:Declare Semaphores\n(sem_worker, sem_report, sem_exit);
+:Setup Shared Memory\n(shm_1, shm_2);
+:Register Signal Handlers;
+
+fork;
+    :Watcher Process;
+    repeat
+        :Monitor Directory Changes;
+        :Update Shared Memory until no more new files
+    while there are new files available;
+    :Distribute Files Among Workers;
+    ->Signals workers;
+    :Wait for watcher to Finish;
+    fork;
+        :Worker Processes;
+        :Wait on sem_worker;
+        repeat
+            :Process Assigned Files;
+            :Post to sem_report until all files are processed
+        repeat while there are files to process
+    end fork;
+
+:Main Process;
+:Wait for Reports from Workers;
+:Generate Final Report;
+:Clean-up Resources;
+
+@enduml

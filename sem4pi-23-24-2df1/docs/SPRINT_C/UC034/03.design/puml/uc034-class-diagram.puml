@@ -1,0 +1,32 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC034
+
+class ResultCandidatesNotificationUI <<interface>>
+
+class ResultCandidatesNotificationController <<controller>>
+
+class JobOpeningManagementService <<service>>
+
+class JobOpeningRepository <<repository>>
+
+class StatusEmail <<value>>
+
+class SMTP <<service>>
+
+
+ResultCandidatesNotificationUI ..> ResultCandidatesNotificationController
+
+ResultCandidatesNotificationController ..> JobOpeningManagementService : uses >
+ResultCandidatesNotificationController ..> JobOpeningRepository : accesses >
+
+JobOpeningRepository <.. RepositoryFactory : creates <
+JobOpeningRepository ..> StatusEmail : saves in database >
+
+JobOpeningManagementService ..> SMTP : sends email >
+
+@enduml

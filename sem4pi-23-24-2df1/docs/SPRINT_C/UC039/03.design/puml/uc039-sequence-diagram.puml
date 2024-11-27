@@ -1,0 +1,59 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC039
+
+actor Admin as Actor
+participant AddUserUI as UI <<presentation>>
+participant AddUserController as Controller <<application>>
+participant SystemUserBuilder as Builder <<builder>>
+participant "systemUser:SystemUser" as Domain <<domain>>
+participant PersistenceContext as Persistence <<persistence>>
+participant RepositoryFactory as Factory <<factory>>
+database UserRepository as Repository <<repository>>
+
+Actor --> UI: Add User
+activate UI
+    UI -> Controller: create
+    UI --> Actor: Ask user information
+    Actor --> UI: Email, Password,\nFirst Name,\nLast Name
+
+    UI --> Actor: Show List\nof Role Types
+    Actor --> UI: Role Type
+
+    UI -> Controller: addUser(password, firstName,\nlastName, email, \nroles)
+    activate Controller
+        note right of Builder:UserBuilder is used to create an entity of type User in a valid state
+
+        Controller -> Builder:createUser()
+        activate Builder
+            Builder -> Domain: create (email,\npassword, firstName,\nlastName,email, roles)
+            Domain->Builder: user
+            Builder -> Controller:user
+        deactivate Builder
+
+        Controller -> Persistence: repositories()
+        activate Persistence
+            note right of Persistence: creates in JPA
+            Persistence -> Factory: create
+            Persistence -> Controller: factory
+        deactivate Persistence
+
+        Controller -> Factory: users()
+        activate Factory
+            Factory -> Repository: create
+            Factory -> Controller: userRepository
+        deactivate Factory
+
+        Controller->Repository:save(user)
+        Controller->UI: user
+    deactivate Controller
+
+        UI-->Actor: inform (in)success of operation
+deactivate UI
+
+@enduml

@@ -1,0 +1,69 @@
+@startuml
+
+title Class Diagram (CD) - UC036
+
+skinparam classAttributeIconSize 0
+
+class DisplayJobApplicationDataUI {
+    +jobOpenings()
+    +jobApplicationsByJobOpening(jobOpening)
+}
+
+class DisplayJobApplicationDataController {
+    +jobOpenings()
+    +jobApplicationsByJobOpening(jobOpening)
+    +session()
+    +authenticatedUser()
+}
+
+class AuthorizationService {
+    +ensureAuthenticatedUserHasAnyOf(roles)
+}
+
+class UserSession {
+    +authenticatedUser()
+}
+
+class JobOpeningManagementService {
+    +findAll()
+    +repositories()
+    +factory()
+    +jobOpeningRepository()
+}
+
+class JobApplicationManagementService {
+    +jobApplicationsOf(jobOpening)
+}
+
+class PersistenceContext {
+    +repositories()
+    +factory()
+}
+
+class RepositoryFactory {
+    +jobOpenings()
+    +jobApplicationRepository()
+}
+
+class JobOpeningRepository {
+    +findAllActive()
+}
+
+class JobApplicationRepository {
+    +applicationsByJobOpening(jobOpening)
+}
+
+DisplayJobApplicationDataUI --> DisplayJobApplicationDataController : controller
+DisplayJobApplicationDataController --> AuthorizationService : authz
+DisplayJobApplicationDataController --> UserSession : session
+DisplayJobApplicationDataController --> JobOpeningManagementService : service
+DisplayJobApplicationDataController --> JobApplicationManagementService : service
+JobOpeningManagementService --> PersistenceContext : persistence
+PersistenceContext --> RepositoryFactory : factory
+RepositoryFactory --> JobOpeningRepository : repository
+RepositoryFactory --> JobApplicationRepository : repository
+JobOpeningManagementService --> JobOpeningRepository : repository
+JobApplicationManagementService --> JobApplicationRepository : repository
+JobApplicationManagementService --> PersistenceContext : persistence
+
+@enduml

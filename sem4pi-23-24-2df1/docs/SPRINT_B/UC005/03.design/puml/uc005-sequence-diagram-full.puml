@@ -1,0 +1,105 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+title System Sequence Diagram - UC005
+
+'hide footbox
+actor CustomerManager as Actor
+participant AddUserUI as UI <<presentation>>
+participant AddUserController as Controller <<application>>
+participant UserManagementService as Service <<service>>
+participant SystemUserBuilder as Builder <<builder>>
+entity "systemUser:SystemUser" as Domain <<domain>>
+participant PersistenceContext as Persistence <<persistence>>
+participant RepositoryFactory as Factory <<factory>>
+database UserRepository as Repository <<repository>>
+
+activate Actor
+Actor -> UI: requests to add User
+activate UI
+    UI -> Controller: create
+    UI --> Actor: request email
+    deactivate UI
+Actor -> UI: email
+activate UI
+    UI --> Actor : request first name
+    deactivate UI
+Actor -> UI: firstName
+activate UI
+    UI --> Actor : request last name
+    deactivate UI
+Actor -> UI: lastName
+activate UI
+    loop option != 0
+        UI --> Actor: Show List of Role Types
+        Actor --> UI: Role Type = Customer
+    end
+    UI --> Actor: request customer's address
+    deactivate UI
+Actor -> UI: address
+activate UI
+
+    UI -> Controller: addUser(email, password, firstName, lastName, email, roles, address)
+    activate Controller
+        Controller -> Controller: username = email
+        activate Controller
+        deactivate Controller
+        Controller -> Service: registerNewUser(username, email, password, firstName, lastName, email, roles, address)
+        activate Service
+            note right of Builder:UserBuilder is used to create an entity of type User in a valid state
+            Service -> Builder: new SystemUserBuilder(policy, enconder)
+            activate Builder
+                Builder --> Service : userBuilder
+                deactivate Builder
+            Service -> Builder: userBuilder.with(username, password, firstName, lastName, email, roles, address)
+            Service -> Builder: userBuilder.build()
+            activate Builder
+                Builder -> Domain : new SystemUser(username, password, firstName, lastName, email, roles, address)
+                activate Domain
+                    Domain --> Builder: user
+                    deactivate Domain
+                Builder --> Service: newUser
+                deactivate Builder
+            Service -> Persistence: repositories()
+                activate Persistence
+                    note right of Persistence: creates in JPA
+                    Persistence -> Factory: create
+                    Persistence --> Service: factory
+                    deactivate Persistence
+                Service --> Controller: repositories
+            deactivate Service
+
+        Controller -> Factory: users()
+        activate Factory
+            Factory -> Repository: create
+            Factory --> Controller: userRepository
+        deactivate Factory
+
+        Controller->Repository:save(user)
+        activate Repository
+            Repository->Repository:insert(user)
+            activate Repository
+                deactivate Repository
+            Repository-->Controller: user
+            deactivate Repository
+
+
+'            Controller -> Service: new CustomerManagerBuilder(policy, encoder)
+'            activate Service
+'                Service --> Controller: customerManagerBuilder
+'                deactivate Service
+'            Controller -> Service: customerManagerBuilder.with(user)
+'            Controller -> CustomerManagerRepository
+'            Controller -> UserRepository: addCustomerToList(customerManager)
+'
+        Controller->UI: user
+    deactivate Controller
+
+        UI-->Actor: inform (in)success of operation
+deactivate UI
+
+@enduml

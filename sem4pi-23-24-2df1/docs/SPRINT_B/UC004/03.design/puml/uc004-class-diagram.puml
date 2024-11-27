@@ -1,0 +1,50 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC004
+
+class ListActiveBackofficeUsersUI <<interface>>
+
+class ListUsersController <<controller>>
+
+class UserManagementService <<service>>
+
+class SystemUserRepository <<repository>>
+
+class RepositoryFactory <<factory>>
+
+class EmailAddress <<value>> <<id>>
+
+class SystemUser <<root>>
+
+class Name <<value>>
+
+class RoleSet <<value>>
+
+class RoleAssignment <<entity>>
+
+enum Role <<value>>
+
+class RoleSet <<value>>
+
+class Set<RoleAssignment> <<value>>
+
+ListActiveBackofficeUsersUI ..> ListUsersController
+
+ListUsersController ..> UserManagementService : uses >
+ListUsersController ..> SystemUserRepository : accesses >
+
+SystemUserRepository <.. RepositoryFactory : creates <
+SystemUserRepository ..> SystemUser : saves in database >
+
+SystemUser -> Name
+SystemUser -> EmailAddress
+SystemUser -left-> RoleSet
+RoleSet ..|> Set
+RoleSet .down.> RoleAssignment
+Role <-down- RoleAssignment
+
+@enduml

@@ -1,0 +1,55 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC025
+
+class DisableCandidateUI <<interface>>
+
+class DisableCandidateController <<controller>>
+
+class CandidateManagementService <<service>>
+
+class CandidateRepository <<repository>>
+
+class RepositoryFactory <<factory>>
+
+class Candidate <<root>>
+
+class EmailAddress <<value>> <<id>>
+
+class SystemUser <<root>>
+
+class Name <<value>>
+
+class RoleSet <<value>>
+
+class RoleAssignment <<entity>>
+
+enum Role <<value>>
+
+class RoleSet <<value>>
+
+class Set<RoleAssignment> <<value>>
+
+DisableCandidateUI ..> DisableCandidateController
+
+DisableCandidateController ..> CandidateManagementService : uses >
+
+CandidateManagementService ..> CandidateRepository : accesses >
+
+CandidateRepository <.. RepositoryFactory : creates <
+CandidateRepository ..> Candidate : saves in database >
+
+Candidate <.. SystemUser : is a >
+
+SystemUser -> Name
+SystemUser -> EmailAddress
+SystemUser -left-> RoleSet
+RoleSet ..|> Set
+RoleSet .down.> RoleAssignment
+Role <-down- RoleAssignment
+
+@enduml

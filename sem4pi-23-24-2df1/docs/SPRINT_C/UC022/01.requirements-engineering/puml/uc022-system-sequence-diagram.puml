@@ -1,0 +1,49 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC022
+actor "Customer Manager" as CM
+participant ":System" as System
+
+activate CM
+    CM -> System: Wants to rank the candidates for a job opening
+        activate System
+        System -> System: Retrieve list of job openings
+        System --> CM: Display list of job openings
+    deactivate System
+
+    CM -> System: Selects a job opening
+        activate System
+        System -> System: Retrieve list of candidates for the selected job opening
+        System --> CM: Display list of candidates with their information
+            note right of CM
+                The candidates' information contains
+                their CV and interview grade (if exists)
+            end note
+    deactivate System
+
+    loop until candidates ranked = number of vacancies
+    CM -> System: Selects a candidate and ranks it
+            activate System
+            System --> CM: Confirmation message
+        deactivate System
+    end loop
+
+    loop until the rest of candidates are ranker
+    CM -> System: Ranks the rest of candidates with 'no rank'
+        activate System
+            System --> CM: Confirmation message
+        deactivate System
+    end loop
+
+    loop all candidates
+    CM -> System: Saves the ranking
+        activate System
+        System -> System: Save the ranking in the database
+        System --> CM: (In)Success message
+    deactivate System
+    end loop
+
+@enduml

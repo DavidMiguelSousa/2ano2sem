@@ -1,0 +1,28 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC033
+actor "Customer Manager" as CM
+participant ":System" as System
+
+activate CM
+    CM -> System: Requests to display job opening's interview grades
+    activate System
+        System -> System : Retrieve job openings that has Phase.INTERVIEW completed
+        activate System
+    deactivate System
+        System --> CM: Display job openings
+    deactivate System
+
+    CM -> System: Select job opening
+    activate System
+        System -> System : Retrieve interview grades for selected job opening
+        activate System
+    deactivate System
+        System --> CM: Display interview grades
+    deactivate System
+deactivate CM
+
+@enduml

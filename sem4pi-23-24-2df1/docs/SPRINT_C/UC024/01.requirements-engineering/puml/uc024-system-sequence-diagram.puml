@@ -1,0 +1,34 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC024
+actor Operator as Actor
+participant ":System" as System
+
+activate Actor
+    Actor -> System: Login
+    activate System
+
+        System -> System: Validate login
+
+        System --> Actor: Allow access to the backoffice application with operator permissions
+    deactivate System
+
+    Actor -> System: Select the option to enable a candidate
+    activate System
+
+        System --> Actor: Show all inactive candidates and ask to select the candidate to be enabled
+    deactivate System
+
+    Actor -> System: Select candidate to be enabled
+    activate System
+
+        System -> System: Enable the selected candidate
+
+        System --> Actor: Inform that the candidate was enabled and allow the selected user access to the Candidate App
+    deactivate System
+deactivate Actor
+
+@enduml

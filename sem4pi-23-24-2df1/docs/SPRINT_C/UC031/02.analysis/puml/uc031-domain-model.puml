@@ -1,0 +1,104 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+top to bottom direction
+left to right direction
+
+hide methods
+hide circle
+
+title Domain Model (DM) - UC031
+
+
+package SystemUserAggregate {
+    class SystemUser <<Root Entity>>
+    class Username <<Value Object>>
+    class Name <<Value Object>>
+    class EmailAddress <<Value Object>>
+    class Password <<Value Object>>
+    enum Role <<Value Object>> {
+        ADMIN
+        CUSTOMER_MANAGER
+        OPERATOR
+        CUSTOMER
+        CANDIDATE
+    }
+}
+
+class Admin
+note top of Admin: conceptual class
+
+class CustomerManager
+note top of CustomerManager: conceptual class
+
+package CandidateAggregate {
+    class Candidate <<Root Entity>>
+}
+
+package JobOpeningAggregate {
+    class JobOpening <<Root Entity>>
+    class JobReference <<Value Object>>
+    package InterviewModelPackage {
+        class InterviewModel <<Value Object>>
+        class InterviewModelDesignation <<Value Object>>
+        class InterviewModelDescription <<Value Object>>
+        class InterviewModelFileExtension <<Value Object>>
+        class InterviewModelFQCLassName <<Value Object>>
+    }
+}
+note right of InterviewModelDesignation: Designation (provided by EAPLI FRAMEWORK)
+note right of InterviewModelDescription: Description (provided by EAPLI FRAMEWORK)
+note right of InterviewModelFileExtension: FileExtension (provided by EAPLI FRAMEWORK)
+note right of InterviewModelFQCLassName: FQClassName (provided by EAPLI FRAMEWORK)
+
+package JobApplicationAggregate {
+    class JobApplication <<Root Entity>>
+    class JobApplicationReference <<Value Object>>
+    enum JobApplicationStatus <<Value Object>> {
+        PENDING
+        APPROVED
+        REJECTED
+    }
+    package InterviewPackage {
+        class Interview <<Value Object>>
+        class InterviewName <<Value Object>>
+        class InterviewDescription <<Value Object>>
+    }
+}
+note right of JobApplicationStatus: ApprovalStatus (provided by EAPLI FRAMEWORK)
+note right of InterviewName: Designation (provided by EAPLI FRAMEWORK)
+note right of InterviewDescription: Description (provided by EAPLI FRAMEWORK)
+
+class ANTLR <<Service>>
+
+SystemUser <--- Candidate : is a <
+
+Admin "1" --- "*" CustomerManager : manages >
+
+CustomerManager "1" ---- "*" JobOpening : creates >
+
+Candidate "1" --- "*" JobApplication : applies to >
+
+JobOpening "1" ---- "*" JobApplication : to <
+JobOpening "1" --- "0..1" InterviewModel : has >
+JobOpening "1" ---- "1" JobReference : identified by >
+
+JobApplication "1" --- "1" JobApplicationReference : identified by >
+JobApplication "1" --- "1" JobApplicationStatus : with >
+JobApplication "1" -- "0..1" Interview : has >
+
+Interview "1" -- "1" InterviewName : identified by >
+Interview "1" --- "1" InterviewDescription : with >
+
+InterviewModel "1" -- "1" InterviewModelDesignation : identified by >
+InterviewModel "1" -- "1" InterviewModelDescription : with >
+InterviewModel "1" -- "1" InterviewModelFileExtension : with >
+InterviewModel "1" -- "1" InterviewModelFQCLassName : with >
+
+InterviewModel <-. ANTLR : <
+
+@enduml

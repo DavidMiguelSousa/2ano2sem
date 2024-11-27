@@ -1,0 +1,11 @@
+INTERVIEW "Multiple choice example-1"
+
+MCQUES [Numbers] "What is the best programing language for the system XPTO?" [10];
+1-OPT Java;
+2-OPT C#;
+3-OPT PHP;
+4-OPT Javascript;
+5-OPT Typescript;
+SOL <4|0.8>;
+SOL <5|0.4>;
+SOL <4, 5|1>;

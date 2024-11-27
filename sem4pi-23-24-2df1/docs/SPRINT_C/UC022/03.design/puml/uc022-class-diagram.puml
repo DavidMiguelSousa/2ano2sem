@@ -1,0 +1,54 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC022
+
+class RankJobApplicationsUI <<interface>>
+
+class RankJobApplicationsController <<controller>>
+
+class JobOpeningManagementService <<service>>
+
+class JobApplicationManagementService <<service>>
+
+class JobOpeningRepository <<repository>>
+
+class JobApplicationRepository <<repository>>
+
+class RepositoryFactory <<factory>>
+
+class JobOpening <<entity>>
+
+class JobApplication <<entity>>
+
+class SystemUser <<entity>>
+
+class Rank <<value object>>
+
+
+
+
+RankUserUI .down.> RankUserController
+
+RankUserController .down.> JobOpeningManagementService : uses >
+RankUserController .down.> JobApplicationManagementService : uses >
+
+JobOpeningManagementService .down.> RepositoryFactory : accesses >
+JobApplicationManagementService .down.> RepositoryFactory : accesses >
+
+JobOpeningRepository <.left. RepositoryFactory : creates <
+JobApplicationRepository <.right. RepositoryFactory : creates <
+
+JobOpeningManagementService .left.> JobOpeningRepository : saves ranks >
+JobApplicationManagementService .right.> JobApplicationRepository : saves rank >
+
+JobOpeningRepository ..> JobOpening : saves ranks
+JobApplicationRepository ..> JobApplication : saves rank
+
+JobOpening --> Rank
+JobApplication --> Rank
+JobApplication --> SystemUser
+@enduml

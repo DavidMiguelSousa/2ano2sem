@@ -1,0 +1,22 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+title Domain Model (DM) - UC028
+package JobApplicationAggregate {
+class JobApplication <<Root Entity>>
+    }
+
+package InterviewPackage {
+         class Interview <<Value Object>>
+         class InterviewTimestamp <<Value Object>>
+}
+
+Interview "1" -- "1" InterviewTimestamp : on >
+JobApplication "1" ---- "0..1" Interview : has >
+@enduml

@@ -1,0 +1,63 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "CustomerManager" as CM
+participant ": ListApplicationsUI" as ListApplicationsUI <<presentation>>
+participant ": ListApplicationsController" as Controller <<application>>
+participant ApplicationsManagementService as Service <<service>>
+
+
+database ApplicationsRepository as ApplicationsRepository <<repository>>
+
+
+
+
+
+activate CM
+   CM -> ListApplicationsUI : asks to  list all applications for a job opening.
+activate ListApplicationsUI
+ListApplicationsUI -> CM : display Job Opening
+  deactivate ListApplicationsUI
+
+            CM -> ListApplicationsUI : select a job opening
+activate ListApplicationsUI
+ListApplicationsUI -> Controller : allApplications()
+deactivate ListApplicationsUI
+ activate Controller
+ activate Service
+                 Controller -> Service : allApplications()
+                  Service -> ApplicationsRepository : allJobOpenings()
+                                 activate ApplicationsRepository
+
+                                 ApplicationsRepository --> ApplicationsRepository : select(Applications)
+
+                                 ApplicationsRepository --> Service : Applications
+                 Service -> Controller : Applications
+                                 deactivate ApplicationsRepository
+                 deactivate Service
+                                 Controller --> ListApplicationsUI : Applications
+
+                         deactivate Controller
+activate ListApplicationsUI
+ alt successful case
+
+   ListApplicationsUI -> CM: display all applications for the selected job opening.
+
+
+  else failure case
+ ListApplicationsUI -> CM: show message "No applications found."
+deactivate ListApplicationsUI
+   end
+    deactivate ListApplicationsUI
+
+
+
+
+deactivate CM
+
+@enduml

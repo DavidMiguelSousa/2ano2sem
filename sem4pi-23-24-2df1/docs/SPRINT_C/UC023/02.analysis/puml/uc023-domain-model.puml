@@ -1,0 +1,92 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+title Domain Model (DM) - UC023
+
+package JobOpeningAggregate {
+    class JobOpening <<Root Entity>>
+    enum JobMode <<Value Object>> {
+        ONSITE
+        HYBRID
+        REMOTE
+    }
+    class ContractType <<Value Object>> {
+        FULL_TIME
+        PART_TIME
+    }
+    class JobReference <<Value Object>>
+    class JobOpeningStatus <<Value Object>>
+    class JobDescription <<Value Object>>
+    class JobTitle <<Value Object>>
+    class NumberOfVacancies <<Value Object>>
+}
+
+package CustomerAggregate {
+    class Customer <<Root Entity>>
+}
+
+package AddressAggregate {
+    class Address <<Root Entity>>
+    class ZipCode <<Value Object>>
+    enum District <<Value Object>> {
+        ACORES
+        AVEIRO
+        BEJA
+        BRAGA
+        BRAGANÇA
+        CASTELO_BRANCO
+        COIMBRA
+        ÉVORA
+        FARO
+        GUARDA
+        LEIRIA
+        LISBOA
+        MADEIRA
+        PORTALEGRE
+        PORTO
+        SANTARÉM
+        SETÚBAL
+        VIANA_DO_CASTELO
+        VILA_REAL
+        VISEU
+    }
+    class County <<Value Object>>
+    class Parish <<Value Object>>
+    class Street <<Value Object>>
+    class DoorNumber <<Value Object>>
+}
+
+package CustomerAggregate {
+    class Customer <<Root Entity>>
+}
+
+package JobRequirementsAggregate {
+    class JobRequirements <<Root Entity>>
+}
+
+Customer "1" ---- "*" JobOpening
+
+Address "1" -- "1" ZipCode
+Address "1" -- "1" District
+Address "1" -- "1" County
+Address "1" -- "1" Parish
+Address "1" -- "1" Street
+Address "1" -- "1" DoorNumber
+
+JobOpening "1" -- "1" JobRequirements
+JobOpening "1" -------- "1" Address
+JobOpening "1" -- "1" JobMode
+JobOpening "1" -- "1" ContractType
+JobOpening "1" -- "1" JobReference
+JobOpening "1" -- "1" JobOpeningStatus
+JobOpening "1" -- "1" JobDescription
+JobOpening "1" -- "1" JobTitle
+JobOpening "1" -- "1" NumberOfVacancies
+
+@enduml

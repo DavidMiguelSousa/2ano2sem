@@ -1,0 +1,37 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+hide methods
+
+title Class Diagram (CD) - UC020
+
+class GenerateInterviewModelUI {
+}
+
+class GenerateInterviewModelController {
+}
+
+class InterviewModelManagementService {
+}
+
+class InterviewModel {
+}
+
+enum QuestionType {
+}
+
+enum InterviewToken {
+}
+
+GenerateInterviewModelUI .right-> GenerateInterviewModelController
+
+GenerateInterviewModelController .down-> InterviewModelManagementService
+
+InterviewModelManagementService -down-> InterviewModel
+InterviewModelManagementService -down-> InterviewToken
+InterviewModelManagementService -down-> QuestionType
+
+@enduml

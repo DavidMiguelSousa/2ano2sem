@@ -1,0 +1,5 @@
+INTERVIEW "PythonProgrammer"
+
+INTQUES [Integer] "How many letters has Python?" [100];
+ANS: 6
+

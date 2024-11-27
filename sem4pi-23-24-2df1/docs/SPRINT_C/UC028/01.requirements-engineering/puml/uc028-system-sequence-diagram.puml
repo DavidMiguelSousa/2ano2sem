@@ -1,0 +1,44 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title system Sequence Diagram (SSD) - UC028
+actor "Customer Manager" as actor
+participant ":System" as system
+
+activate actor
+
+    actor -> system: Login
+    activate system
+
+    system -> actor: Allow access to the backoffice application with Customer Manager permissions
+    deactivate system
+
+    actor -> system: Record time and date for an interview with a candidate
+    activate system
+
+    system -> actor: Show job openings
+    deactivate system
+
+    actor -> system: Choose job opening
+    activate system
+
+    system -> actor: Show job applications for the selected job opening
+    deactivate system
+
+    actor -> system: Choose job application
+    activate system
+
+    system -> actor: Ask for timestamp for the interview
+    deactivate system
+
+    actor -> system: Record timestamp
+    activate system
+
+    system -> actor: (un)success of the operation
+    deactivate system
+
+deactivate actor
+
+@enduml

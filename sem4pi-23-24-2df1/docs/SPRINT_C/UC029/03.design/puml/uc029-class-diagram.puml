@@ -1,0 +1,79 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC029
+
+class VerifyJobOpeningsRequirementsUI <<interface>>
+
+class VerifyJobOpeningsRequirementsController <<controller>>
+
+class JobOpeningManagementService <<service>>
+
+class JobApplicationManagementService <<service>>
+
+class JobRequirementsManagementService <<service>>
+
+class JobOpeningRepository <<repository>>
+
+class JobApplicationRepository <<repository>>
+
+class RepositoryFactory <<factory>>
+
+class JobRequirementsParser <<parser>>
+
+class JobRequirementsVisitor <<visitor>>
+
+class JobOpening <<entity>>
+
+class JobApplication <<entity>>
+
+enum JobApplicationStatus <<Value Object>> {
+        PENDING
+        APPROVED
+        REJECTED
+    }
+
+enum Phases <<value object>> {
+    APPLICATION
+    SCREENING
+    INTERVIEW
+    ANALYSIS
+    RESULT
+}
+
+class JobRequirements <<value object>>
+
+
+VerifyJobOpeningsRequirementsUI ..> VerifyJobOpeningsRequirementsController
+
+VerifyJobOpeningsRequirementsController ..> JobOpeningManagementService : uses >
+VerifyJobOpeningsRequirementsController ..> JobApplicationManagementService : uses >
+VerifyJobOpeningsRequirementsController ..> JobRequirementsManagementService : uses
+
+VerifyJobOpeningsRequirementsController ..> JobOpeningRepository : accesses >
+VerifyJobOpeningsRequirementsController ..> JobApplicationRepository : accesses >
+
+JobOpeningManagementService --> JobOpeningRepository : uses
+JobApplicationManagementService --> JobApplicationRepository : uses
+JobRequirementsManagementService --> JobRequirementsParser : uses
+
+JobRequirementsParser --> JobRequirementsVisitor : uses >
+JobRequirementsParser  ..> JobRequirements : uses >
+JobRequirementsVisitor --> JobRequirements : analyzes >
+
+JobOpeningRepository <.. RepositoryFactory : creates <
+JobApplicationRepository <.. RepositoryFactory : creates <
+
+JobOpeningRepository ..> JobOpening : obtain job opening from database >
+JobApplicationRepository ..> JobApplication : updates status in database >
+
+JobOpening "1" --> "4..5" Phases : has
+
+JobApplication "1" --> "1" JobApplicationStatus : has
+JobApplication "1" --> "1" JobRequirements : has
+
+
+@enduml

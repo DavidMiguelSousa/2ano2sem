@@ -1,0 +1,140 @@
+@startuml
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+top to bottom direction
+left to right direction
+
+hide methods
+hide circle
+
+title Domain Model (DM) - UC037
+
+
+package OperatorAggregate {
+    class Operator <<Root Entity>>
+}
+
+package JobOpeningAggregate {
+    class JobOpening <<Root Entity>>
+    class JobReference <<Value Object>>
+    class JobDescription <<Value Object>>
+    class JobFunction <<Value Object>>
+    enum JobMode <<Value Object>> {
+        ONSITE
+        HYBRID
+        REMOTE
+    }
+    class ContractType <<Value Object>> {
+        FULL_TIME
+        PART_TIME
+    }
+    class NumberOfVacancies <<Value Object>>
+    enum Phase <<Value Object>> {
+        APPLICATION
+        SCREENING
+        INTERVIEWS
+        ANALYSIS
+        RESULT
+    }
+    class PhaseDetails <<Value Object>>
+    class DateInterval <<Value Object>>
+    enum Status <<Value Object>> {
+        PENDING
+        IN_PROGRESS
+        COMPLETED
+    }
+
+    package JobRequirementsPackage {
+        class JobRequirements <<Value Object>>
+        class JobRequirementsDesignation <<Value Object>>
+        class JobRequirementsDescription <<Value Object>>
+        class JobRequirementsFileExtension <<Value Object>>
+        class JobRequirementsFQCLassName <<Value Object>>
+    }
+}
+
+package JobApplicationAggregate {
+    class JobApplication <<Root Entity>>
+    class JobApplicationReference <<Value Object>>
+    enum JobApplicationStatus <<Value Object>> {
+        PENDING
+        APPROVED
+        REJECTED
+    }
+    class Rank <<Value Object>>
+    class RankValue <<Value Object>>
+    enum RankStatus <<Value Object>> {
+        PENDING
+        RANKED
+        UNRANKED
+    }
+    class CurriculumVitae <<Value Object>>
+    class PhoneNumber <<Value Object>>
+    class JobApplicationEmail <<Value Object>>
+    class JobApplicationBigFile <<Value Object>>
+    class JobApplicationAdditionalData <<Value Object>>
+
+    package ApplicationRequirementsPackage {
+        class ApplicationRequirements <<Value Object>>
+        class ApplicationRequirementsDesignation <<Value Object>>
+        class ApplicationRequirementsDescription <<Value Object>>
+        enum ApplicationRequirementsStatus <<Value Object>> {
+            PENDING
+            APPROVED
+            REJECTED
+        }
+    }
+package CandidateAggregate {
+    class Candidate <<Root Entity>>
+}
+}
+
+
+
+
+
+JobOpening "1" ------- "*" JobApplication : to <
+JobOpening "1" --------- "1" JobRequirements : has >
+JobOpening "1" -- "1" JobReference : identified by >
+JobOpening "1" -- "1" JobFunction : with >
+JobOpening "1" -- "1" JobDescription : with >
+JobOpening "1" -- "1" ContractType : with >
+JobOpening "1" -- "1" JobMode : with >
+JobOpening "1" -- "1" NumberOfVacancies : with >
+JobOpening "1" -- "1" Status : has >
+JobOpening "1" -- "4..5" Phase : has >
+
+JobApplication "1" -- "1" JobApplicationReference : identified by >
+JobApplication "1" -- "1" JobApplicationStatus : with >
+JobApplication "1" -- "1" CurriculumVitae : of <
+JobApplication "1" -- "1" PhoneNumber : with >
+JobApplication "1" -- "1" Rank : with >
+JobApplication "1" -- "1" JobApplicationEmail : with >
+JobApplication "1" -- "1" JobApplicationBigFile : with >
+JobApplication "1" -- "1" JobApplicationAdditionalData : with >
+JobApplication "1" -- "1" ApplicationRequirements : with >
+
+ApplicationRequirements "1" -- "1" ApplicationRequirementsDesignation : identified by >
+ApplicationRequirements "1" -- "1" ApplicationRequirementsDescription : with >
+ApplicationRequirements "1" -- "1" ApplicationRequirementsStatus : with >
+
+JobRequirements "1" -- "1" JobRequirementsDesignation : identified by >
+JobRequirements "1" -- "1" JobRequirementsDescription : with >
+JobRequirements "1" -- "1" JobRequirementsFileExtension : with >
+JobRequirements "1" -- "1" JobRequirementsFQCLassName : with >
+
+JobRequirements <-. ANTLR : <
+Rank "1" -- "1" RankValue : with >
+Rank "1" -- "1" RankStatus : with >
+Phase "1" -- "1" PhaseDetails : with >
+PhaseDetails "1" -- "1" Status : has >
+PhaseDetails "1" -- "1" DateInterval : has >
+Operator "1" -------------- "*" Candidate : manages >
+
+
+
+@enduml

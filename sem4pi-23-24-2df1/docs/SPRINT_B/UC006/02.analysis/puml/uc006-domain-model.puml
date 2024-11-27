@@ -1,0 +1,111 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+top to bottom direction
+left to right direction
+
+
+hide circle
+hide methods
+
+title Domain Model UC006
+
+
+package JobRequirementsAggregate {
+    class JobRequirements <<Root Entity>>
+}
+
+class ANTLR <<Service>> {
+}
+package AddressAggregate {
+    class Address <<Root Entity>>
+    class ZipCode <<Value Object>>
+    enum District <<Value Object>> {
+        ACORES
+        AVEIRO
+        BEJA
+        BRAGA
+        BRAGANÇA
+        CASTELO_BRANCO
+        COIMBRA
+        ÉVORA
+        FARO
+        GUARDA
+        LEIRIA
+        LISBOA
+        MADEIRA
+        PORTALEGRE
+        PORTO
+        SANTARÉM
+        SETÚBAL
+        VIANA_DO_CASTELO
+        VILA_REAL
+        VISEU
+    }
+    class County <<Value Object>>
+    class Parish <<Value Object>>
+    class Street <<Value Object>>
+    class DoorNumber <<Value Object>>
+}
+
+package CustomerManagerAggregate {
+    class CustomerManager <<Root Entity>>
+}
+
+package LanguageEngineerAggregate {
+    class LanguageEngineer <<Root Entity>>
+}
+package JobOpeningAggregate {
+    class JobOpening <<Root Entity>>
+    enum JobMode <<Value Object>> {
+        ONSITE
+        HYBRID
+        REMOTE
+    }
+    class ContractType <<Value Object>> {
+        FULL_TIME
+        PART_TIME
+    }
+    class JobReference <<Value Object>>
+    class JobOpeningProcess <<Value Object>>
+    class JobOpeningStatus <<Value Object>>
+    enum Phase <<Value Object>> {
+        APPLICATION
+        SCREENING
+        INTERVIEWS
+        ANALYSIS
+        RESULT
+    }
+    class JobDescription <<Value Object>>
+    class JobFunction <<Value Object>>
+    class NumberOfVacancies <<Value Object>>
+}
+
+Address "1" -- "1" ZipCode
+Address "1" -- "1" District
+Address "1" -- "1" County
+Address "1" -- "1" Parish
+Address "1" -- "1" Street
+Address "1" -- "1" DoorNumber
+
+LanguageEngineer "1" --- "*" JobOpening
+CustomerManager "1" -- "*" JobOpening
+
+JobOpening "1" -------- "1" Address
+JobOpening "1" -- "1" JobMode
+JobOpening "1" -- "1" ContractType
+JobOpening "1" -- "1" JobReference
+JobOpening "1" -- "1" JobOpeningStatus
+JobOpening "1" -- "1" JobDescription
+JobOpening "1" -- "1" JobFunction
+JobOpening "1" -- "1" JobRequirements
+JobOpening "1" -- "1" NumberOfVacancies
+
+JobOpening "1" -- "1" JobOpeningProcess
+JobOpeningProcess -- Phase
+JobRequirements <-- ANTLR
+@enduml

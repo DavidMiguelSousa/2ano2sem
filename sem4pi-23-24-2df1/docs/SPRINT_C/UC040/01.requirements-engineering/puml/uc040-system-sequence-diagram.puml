@@ -1,0 +1,26 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC040
+actor Customer as Actor
+participant ":System" as System
+
+activate Actor
+    Actor -> System: Login
+    activate System
+
+        System -> System: Validate login
+
+        System --> Actor: Allow access to the Customer App
+    deactivate System
+
+    Actor -> System: Select the option to list all job openings
+    activate System
+
+        System --> Actor: Show all job openings
+    deactivate System
+deactivate Actor
+
+@enduml

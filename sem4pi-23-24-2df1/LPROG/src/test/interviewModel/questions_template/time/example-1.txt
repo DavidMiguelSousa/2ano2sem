@@ -1,0 +1,4 @@
+INTERVIEW "Time example-1"
+
+TIMEQUES [HH:MM] "The middle of the day is at what time." [10];
+SOL <12:00|1>;

@@ -1,0 +1,91 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+top to bottom direction
+left to right direction
+
+hide methods
+hide circle
+
+title Project Domain Model - UC033
+
+class CustomerManager
+note left of CustomerManager: conceptual class
+
+package CustomerAggregate {
+    class Customer <<Root Entity>>
+    class CustomerCode <<Value Object>>
+}
+
+package CandidateAggregate {
+    class Candidate <<Root Entity>>
+}
+
+package JobOpeningAggregate {
+    class JobOpening <<Root Entity>>
+    enum Phase <<Value Object>> {
+        APPLICATION
+        SCREENING
+        INTERVIEWS
+        ANALYSIS
+        RESULT
+    }
+    class PhaseDetails <<Value Object>>
+    class DateInterval <<Value Object>>
+    enum Status <<Value Object>> {
+        PENDING
+        IN_PROGRESS
+        COMPLETED
+    }
+    package InterviewModelPackage {
+        class InterviewModel <<Value Object>>
+        class InterviewModelDesignation <<Value Object>>
+        class InterviewModelDescription <<Value Object>>
+        class InterviewModelFileExtension <<Value Object>>
+        class InterviewModelFQCLassName <<Value Object>>
+    }
+}
+note right of InterviewModelDesignation: Designation (provided by EAPLI FRAMEWORK)
+note right of InterviewModelDescription: Description (provided by EAPLI FRAMEWORK)
+note right of InterviewModelFileExtension: FileExtension (provided by EAPLI FRAMEWORK)
+note right of InterviewModelFQCLassName: FQClassName (provided by EAPLI FRAMEWORK)
+
+package JobApplicationAggregate {
+    class JobApplication <<Root Entity>>
+    package InterviewPackage {
+        class Interview <<Value Object>>
+        class InterviewDate <<Value Object>>
+        class InterviewName <<Value Object>>
+        class InterviewDescription <<Value Object>>
+        class InterviewGrade <<Value Object>>
+    }
+}
+note right of InterviewName: Designation (provided by EAPLI FRAMEWORK)
+note right of InterviewDescription: Description (provided by EAPLI FRAMEWORK)
+
+CustomerManager "1" -------- "*" Customer : manages >
+
+Candidate "1" ------- "*" JobApplication : applies to >
+
+CustomerManager "1" -- "*" JobOpening : creates >
+
+JobOpening "1" ------- "*" JobApplication : to <
+JobOpening "1" -- "4..5" Phase : has >
+
+Phase "1" -- "1" PhaseDetails : with >
+PhaseDetails "1" -- "1" Status : has >
+PhaseDetails "1" -- "1" DateInterval : has >
+
+JobApplication "1" ---- "0..1" Interview : has >
+
+Interview "1" -- "1" InterviewDate : on >
+Interview "1" -- "1" InterviewName : identified by >
+Interview "1" -- "1" InterviewDescription : with >
+Interview "1" -- "1" InterviewGrade : with >
+
+@enduml

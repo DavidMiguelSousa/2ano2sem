@@ -1,0 +1,106 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+title System Sequence Diagram - UC019
+
+'hide footbox
+actor CustomerManager as CM
+participant SelectInterviewModelUI as UI <<presentation>>
+participant SelectInterviewModelController as Controller <<application>>
+participant JobOpeningManagementService as JobOpeningManagementService <<service>>
+participant listInterviewModelService as listInterviewModelService <<service>>
+database InterviewModelRepository as interviewModelRepository <<repository>>
+database JobOpeningRepository as JobOpeningRepository <<repository>>
+database DomainRepository as DomainRepository <<repository>>
+
+activate CM
+
+    CM -> UI : choosing the interview model for a job opening.
+
+    activate UI
+        UI -> Controller : list with job openings
+
+             activate Controller
+                Controller -> JobOpeningManagementService : findAllAvailable()
+
+             activate JobOpeningManagementService
+                JobOpeningManagementService -> JobOpeningRepository : findAll()
+
+                    activate JobOpeningRepository
+                        JobOpeningRepository --> JobOpeningManagementService : list with job openings
+                    deactivate JobOpeningRepository
+
+                JobOpeningManagementService --> Controller : list with job openings
+             deactivate JobOpeningManagementService
+
+                Controller --> UI : list with job openings
+             deactivate Controller
+
+        UI --> CM : list with job openings
+
+    deactivate UI
+        CM -> UI : enter the job opening reference number
+
+    alt successful case
+
+        activate UI
+
+        CM -> UI : select the interview model
+
+        UI -> Controller : assignInterviewModel()
+
+            activate Controller
+
+                Controller -> JobOpeningManagementService : findJobOpeningById(jobReference)
+
+                    activate JobOpeningManagementService
+                        JobOpeningManagementService -> JobOpeningRepository : findByJobReference(id)
+
+                        activate JobOpeningRepository
+                            JobOpeningRepository --> DomainRepository : ofIdentity(reference)
+
+                            activate DomainRepository
+                                DomainRepository --> JobOpeningRepository : jobOpening
+
+                            deactivate DomainRepository
+
+                            JobOpeningRepository --> JobOpeningManagementService : jobOpening
+                        deactivate JobOpeningRepository
+
+                        JobOpeningManagementService -> listInterviewModelService : findInterviewModelById(interviewModelReference)
+
+                        activate listInterviewModelService
+                            listInterviewModelService -> interviewModelRepository :findModelByDesignation(id)
+
+                            activate interviewModelRepository
+                                interviewModelRepository --> listInterviewModelService : sfdf
+
+                            deactivate interviewModelRepository
+
+                            listInterviewModelService --> JobOpeningManagementService : djjfdj
+
+                        deactivate listInterviewModelService
+
+                        JobOpeningManagementService --> Controller : defineInterviewModel()
+                    deactivate JobOpeningManagementService
+                    Controller --> UI : defineInterviewModel
+
+            deactivate Controller
+
+                UI-->CM : the interview model was successfully selected
+
+    else insucessful case
+        UI --> CM : the interview model reference number is invalid
+        deactivate UI
+    end
+
+
+
+deactivate CM
+
+
+@enduml

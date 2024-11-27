@@ -1,0 +1,36 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - US1001
+actor CustomerManager as CM
+
+activate CM
+    CM -> ":System" : asks to create a Customer
+activate ":System"
+    ":System" --> CM : requests role
+    deactivate ":System"
+CM -> ":System" : selects 'Customer'
+activate ":System"
+    ":System" --> CM : requests name
+    deactivate ":System"
+CM-> ":System" : provides name (first name, last name)
+activate ":System"
+    ":System" --> CM : requests email
+    deactivate ":System"
+CM-> ":System" : provides email
+activate ":System"
+    ":System" -> ":System": generates password
+    activate ":System"
+    deactivate ":System"
+    ":System" -> ":System": defines username = email
+    activate ":System"
+    deactivate ":System"
+    ":System" -> ":System": creates User (username, name, email, password)
+        activate ":System"
+            ":System" -> ":System": creates Customer (User)
+            ":System" --> CM: operation successful
+        deactivate ":System"
+    deactivate ":System"
+@enduml

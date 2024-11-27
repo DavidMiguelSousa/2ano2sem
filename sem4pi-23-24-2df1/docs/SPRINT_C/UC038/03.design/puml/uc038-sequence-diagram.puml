@@ -1,0 +1,129 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC038
+
+actor Candidate as Actor
+participant ListCandidateApplicationsUI as UI <<presentation>>
+participant ListCandidateApplicationsController as Controller <<application>>
+participant "authzService:AuthorizationService" as AuthzService <<service>>
+participant UserSession as UserSession <<service>>
+participant CandidateBuilder as CandidateBuilder <<service>>
+participant "candidate:Candidate" as CandidateDomain <<domain>>
+participant TcpService as TcpService <<service>>
+participant TcpChatCli as Client <<service>>
+participant TcpChatSrv as Server <<service>>
+participant PersistenceContext as Persistence <<persistence>>
+participant RepositoryFactory as Factory <<factory>>
+database JobApplicationRepository as JobApplicationRepository <<repository>>
+participant "application:JobApplication" as JobApplicationDomain <<domain>>
+database CandidateRepository as CandidateRepository <<repository>>
+
+Actor --> UI: List candidate applications
+activate UI
+
+    UI -> Controller: new ListCandidateApplicationsController()
+    activate Controller
+
+        Controller -> Persistence: repositories()
+        activate Persistence
+            note right of Persistence: creates in JPA
+            Persistence -> Factory: create
+            Persistence --> Controller: factory
+        deactivate Persistence
+
+        Controller -> Factory: jobApplications()
+        activate Factory
+            Factory -> JobApplicationRepository: create
+            Factory --> Controller: jobApplicationRepository
+        deactivate Factory
+
+        Controller -> Persistence: repositories()
+        activate Persistence
+            note right of Persistence: creates in JPA
+            Persistence -> Factory: create
+            Persistence --> Controller: factory
+        deactivate Persistence
+
+        Controller -> Factory: candidates()
+        activate Factory
+            Factory -> JobApplicationRepository: create
+            Factory --> Controller: candidateRepository
+        deactivate Factory
+
+        Controller -> TcpService: new TcpService(candidateRepository, jobApplicationRepository)
+    deactivate Controller
+
+    UI -> Controller: getLoggedCandidate()
+    activate Controller
+
+        Controller -> AuthzService: getLoggedCandidate()
+        activate AuthzService
+
+            AuthzService -> UserSession: get()
+            activate UserSession
+
+                UserSession --> AuthzService: user
+            deactivate UserSession
+
+            AuthzService --> Controller: user
+        deactivate AuthzService
+
+        Controller -> CandidateBuilder: build()
+        activate CandidateBuilder
+
+            CandidateBuilder -> CandidateDomain: create
+            CandidateBuilder --> Controller: candidate
+        deactivate CandidateBuilder
+
+        Controller --> UI: candidate
+    deactivate Controller
+
+    UI -> Controller: retrieveCandidateApplicationsFromServer(candidate)
+    activate Controller
+
+        Controller -> TcpService: communicate(MessageCode.LIST_CANDIDATE_APPLICATIONS, candidateEmail, "")
+        activate TcpService
+
+            TcpService -> Server: startServer(jobApplicationRepository, candidateRepository)
+            activate Server
+
+                Server -> Server: new ServerSocket(8080)
+            deactivate Server
+
+            TcpService -> Client: connect()
+            activate Client
+
+                Client -> Client: new Socket(InetAddress.getLocalHost(), 8080);
+                Client -> Client: new DataOutputStream(sock.getOutputStream());
+                Client -> Client: new DataInputStream(sock.getInputStream());
+            deactivate Client
+
+            TcpService -> Client: listenForResponse()
+
+            TcpService -> Client: sendMessage(versionBytes, codeBytes, data1Bytes, data2Bytes)
+
+            TcpService -> Client: receiveMessage()
+
+            TcpService -> Client: close()
+
+            TcpService -> Service: stopServer()
+
+            TcpService -> TcpService: serverThread.join()
+
+            TcpService --> Controller: response
+        deactivate TcpService
+
+        Controller -> TcpService: findApplicationsByCandidate(candidate)
+
+        Controller --> UI: applications
+    deactivate Controller
+
+    UI --> Actor: Display applications
+deactivate UI
+
+@enduml

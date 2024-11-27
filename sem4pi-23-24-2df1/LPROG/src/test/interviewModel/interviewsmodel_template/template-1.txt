@@ -1,0 +1,37 @@
+INTERVIEW "Template 1"
+
+DATEQUES [DD/MM/YYYY] "When it's the last day of the year 2020?" [10];
+ANS:
+
+DECQUES [Decimal] "Write the first 3 digits of pi." [10];
+ANS:
+
+INTQUES [Integer] "What is the biggest integer that can be stored in a 16-bit signed integer?" [10];
+ANS:
+
+MCQUES [Numbers] "What is the best programing language for the system XPTO?" [10];
+1-OPT Java;
+2-OPT C#;
+3-OPT PHP;
+4-OPT Javascript;
+5-OPT Typescript;
+ANS:
+
+NSQUES [1-5] "How much do you love ISEP?" [10];
+ANS:
+
+SAQUES [Text] "What's the first month of the year?" [10];
+ANS:
+
+SCQUES [Number] "What does the term informatics primarily refer to?" [10];
+1-OPT The study of cultural impacts of technology;
+2-OPT The study and application of data and computational algorithms;
+3-OPT The legal aspects of information distribution;
+4-OPT The hardware architecture of computer systems;
+ANS:
+
+TIMEQUES [HH:MM] "The middle of the day is at what time." [10];
+ANS: afawfafaw   aaw$%"%#&$%/(&/=()?(!"!$!!$!$  ;
+
+TFQUES [TRUE|FALSE] "Informatics engineering exclusively focuses on creating software applications." [10];
+ANS:

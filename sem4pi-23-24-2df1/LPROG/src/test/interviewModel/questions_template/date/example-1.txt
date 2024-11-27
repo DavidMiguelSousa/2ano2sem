@@ -1,0 +1,4 @@
+INTERVIEW "Date example-1"
+
+DATEQUES [DD/MM/YYYY] "When it's the last day of the year 2020?" [10];
+SOL <31/12/2020|1>;

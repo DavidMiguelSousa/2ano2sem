@@ -1,0 +1,8 @@
+INTERVIEW "Example-1"
+
+SCQUES [Number] "What does the term informatics primarily refer to?" [10];
+1-OPT The study of cultural impacts of technology;
+2-OPT The study and application of data and computational algorithms;
+3-OPT The legal aspects of information distribution;
+4-OPT The hardware architecture of computer systems;
+SOL <2|1>;

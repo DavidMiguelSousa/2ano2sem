@@ -1,0 +1,26 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC038
+actor Candidate as Actor
+participant ":System" as System
+
+activate Actor
+    Actor -> System: Login
+    activate System
+
+        System -> System: Validate login
+
+        System --> Actor: Allow access to the Candidate App
+    deactivate System
+
+    Actor -> System: Select the option to list all applications (including their state and the number of applicants)
+    activate System
+
+        System --> Actor: Show all applications (including their state and the number of applicants)
+    deactivate System
+deactivate Actor
+
+@enduml

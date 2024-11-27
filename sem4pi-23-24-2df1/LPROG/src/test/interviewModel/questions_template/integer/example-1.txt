@@ -1,0 +1,4 @@
+INTERVIEW "Integer example-1"
+
+INTQUES [Integer] "What is the biggest integer that can be stored in a 16 bit signed integer?" [10];
+SOL <32767|1>;

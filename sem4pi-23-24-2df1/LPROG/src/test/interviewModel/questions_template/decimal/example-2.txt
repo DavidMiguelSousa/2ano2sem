@@ -1,0 +1,4 @@
+INTERVIEW "Decimal example-2"
+
+DECQUES [Decimal] "In a text mining task, you processed a document containing 450 words and found that 72 of those words were unique. What is the ratio of unique words to total words in the document, rounded to two decimal places?" [10];
+SOL <0.16|1>;

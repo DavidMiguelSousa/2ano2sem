@@ -1,0 +1,68 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC005
+
+class AddUserUI <<interface>>
+
+class AddUserController <<controller>>
+
+class UserManagementService <<service>>
+
+class UserRepository <<repository>>
+
+class RepositoryFactory <<factory>>
+
+class EmailAddress <<value>> <<id>>
+
+class SystemUser <<root>>
+
+class Password <<value>>
+
+class Name <<value>>
+
+class RoleSet <<value>>
+
+class RoleAssignment <<entity>>
+
+enum Role <<value>>
+
+class RoleSet <<value>>
+
+class Set<RoleAssignment> <<value>>
+
+class PasswordPolicy <<service>>
+
+class PasswordEncoder <<service>>
+
+class SystemUserBuilder <<factory>>
+
+AddUserUI ..> AddUserController
+
+AddUserController ..> UserManagementService : uses >
+AddUserController ..> UserRepository : accesses >
+
+UserManagementService ..> SystemUserBuilder : uses
+
+UserRepository <.. RepositoryFactory : creates <
+UserRepository ..> SystemUser : saves in database >
+
+SystemUserBuilder ..> SystemUser : creates >
+
+SystemUserBuilder ..> PasswordPolicy : follows >
+SystemUserBuilder ..> PasswordEncoder : uses >
+
+SystemUser -> Name
+SystemUser -> Password
+SystemUser -> EmailAddress
+SystemUser -left-> RoleSet
+RoleSet ..|> Set
+RoleSet .down.> RoleAssignment
+Role <-down- RoleAssignment
+Password ..> PasswordPolicy
+Password ..> PasswordEncoder : creates <
+
+@enduml

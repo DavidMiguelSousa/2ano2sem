@@ -1,0 +1,61 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC031
+
+class UploadTextInterviewModelUI <<interface>>
+class UploadTextInterviewModelController <<controller>>
+class InterviewManagementService <<service>>
+class JobApplicationManagementService <<service>>
+class JobOpeningManagementService <<service>>
+class JobApplicationRepository <<repository>>
+class JobOpeningRepository <<repository>>
+class InterviewModelRepository <<repository>>
+class RepositoryFactory <<factory>>
+class JobApplication <<root>>
+class JobOpening <<root>>
+
+class JobOpeningBuilder <<builder>>
+class JobApplicationBuilder <<builder>>
+
+class JobReference <<value>>
+
+package InterviewModelPackage {
+    class InterviewModel <<Value Object>>
+    class InterviewModelDesignation <<Value Object>>
+    class InterviewModelDescription <<Value Object>>
+    class InterviewModelFileExtension <<Value Object>>
+}
+
+
+UploadTextInterviewModelUI ..> UploadTextInterviewModelController
+
+UploadTextInterviewModelController ..> InterviewManagementService : uses >
+UploadTextInterviewModelController ..> JobApplicationManagementService : uses >
+UploadTextInterviewModelController ..> JobOpeningManagementService : uses >
+
+UploadTextInterviewModelController ..> JobOpeningRepository : accesses >
+UploadTextInterviewModelController ..> JobApplicationRepository : accesses >
+
+JobOpeningManagementService ..> JobOpeningBuilder : uses
+JobApplicationManagementService ..> JobApplicationBuilder : uses
+InterviewManagementService ..> InterviewModelBuilder : uses
+
+JobOpeningRepository <.. RepositoryFactory : creates <
+JobApplicationRepository <.. RepositoryFactory : creates <
+JobOpeningRepository ..> JobOpening : saves in database
+JobApplicationRepository ..> JobApplication : saves in database
+InterviewModelRepository ..> InterviewModel : saves in database
+
+JobOpening -> JobReference
+JobOpening <-- JobApplication
+JobOpening --> InterviewModel
+
+InterviewModel --> InterviewModelDesignation : identified by >
+InterviewModel --> InterviewModelDescription : with >
+InterviewModel --> InterviewModelFileExtension : with >
+
+@enduml

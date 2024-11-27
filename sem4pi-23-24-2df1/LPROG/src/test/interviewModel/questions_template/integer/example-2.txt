@@ -1,0 +1,4 @@
+INTERVIEW "Integer example-2"
+
+INTQUES [Integer] "How many @ are there in a email address?" [10];
+SOL <1|1>;

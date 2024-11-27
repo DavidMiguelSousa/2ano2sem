@@ -1,0 +1,55 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC020
+
+actor CustomerManager as Actor
+participant GenerateInterviewModelUI as UI <<presentation>>
+participant GenerateInterviewModelController as Controller <<application>>
+participant InterviewModelManagementService as Service <<service>>
+
+Actor -> UI: Generate Interview Model
+activate UI
+    UI --> Actor: Ask for Interview Model Name
+
+    Actor -> UI: Interview Model Name
+
+    UI -> Controller: createFile(fileName)
+    activate Controller
+
+        Controller -> Service: createFile(fileName)
+        activate Service
+
+            Service --> Controller: fileCreated
+        deactivate Service
+
+        Controller --> UI: fileCreated
+    deactivate Controller
+
+    UI --> Actor: Ask for question details
+
+    Actor -> UI: Selects question type, types question, options (if applicable), correct answer(s) and grade system
+
+    UI -> UI: buildQuestion(questionType)
+
+    loop while (more questions) is (true)
+        UI -> Controller: appendQuestion()
+        activate Controller
+
+            Controller -> Service: appendQuestion()
+            activate Service
+
+                Service --> Controller: questionAppended
+            deactivate Service
+
+            Controller --> UI: questionAppended
+        deactivate Controller
+    end
+
+    UI --> Actor: (in)success of the operation
+deactivate UI
+@enduml

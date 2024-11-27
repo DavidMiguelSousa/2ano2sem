@@ -1,0 +1,38 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC036
+actor "Customer Manager" as actor
+participant ":System" as system
+
+activate actor
+
+    actor -> system: Login
+    activate system
+
+    system -> actor: Allow access to the backoffice application with Customer Manager permissions
+    deactivate system
+
+    actor -> system: Display all the data of an application
+    activate system
+
+    system -> actor: Display all job openings and ask user to select one
+    deactivate system
+
+    actor -> system: Choose a job opening
+    activate system
+
+    system -> actor: Display all the applications for the selected job opening
+    deactivate system
+
+    actor -> system: Choose an application
+    activate system
+
+    system -> actor: Display all the data of the selected application
+    deactivate system
+
+deactivate actor
+
+@enduml

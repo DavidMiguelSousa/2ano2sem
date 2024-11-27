@@ -1,0 +1,69 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC004
+
+actor Admin as Actor
+participant ListActiveBackofficeUsersUI as UI <<presentation>>
+participant ListUsersController as Controller <<application>>
+participant PersistenceContext as Persistence <<persistence>>
+participant RepositoryFactory as Factory <<factory>>
+database SystemUserRepository as Repository <<repository>>
+participant UserManagementService as Service <<service>>
+participant "systemUser:SystemUser" as Domain <<domain>>
+participant BaseRoles as Roles <<domain>>
+
+Actor --> UI: List Active Backoffice Users
+activate UI
+    UI -> Controller: activeBackofficeUsers()
+    activate Controller
+
+        Controller -> Persistence: repositories()
+        activate Persistence
+            note right of Persistence: creates in JPA
+            Persistence -> Factory: create
+            Persistence --> Controller: factory
+        deactivate Persistence
+
+        Controller -> Factory: users()
+        activate Factory
+            Factory -> Repository: create
+            Factory --> Controller: userRepository
+        deactivate Factory
+
+        Controller -> Service: activeUsers()
+        activate Service
+
+            Service -> Repository: activeUsers()
+            activate Repository
+
+                Repository --> Service: users
+            deactivate Repository
+
+            loop for all users
+                Service -> Domain: name()
+                Service -> Domain: email()
+                Service -> Domain: roleTypes()
+                activate Domain
+
+                    Domain --> Service: user's details
+                deactivate Domain
+            end loop
+
+                Domain --> Service: user's details
+            deactivate Domain
+
+            Service --> Controller: users with respective details
+        deactivate Service
+
+        Controller --> UI: users
+    deactivate Controller
+
+    UI --> Actor: display users
+deactivate UI
+
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC014
+actor CustomerManager as CM
+
+activate CM
+
+    CM -> ":System" : want to display personal data of a candidate
+
+    activate ":System"
+
+        ":System" --> CM: request for username
+
+    deactivate ":System"
+
+        CM -> ":System" : send username
+
+    activate ":System"
+
+        alt successful case
+
+            ":System" --> CM: display personal data of a candidate
+            else failure case
+            ":System" --> CM: show message "No candidates found."
+
+        end
+    deactivate ":System"
+
+deactivate CM
+
+@enduml

@@ -1,0 +1,47 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+title Class Diagram - UC037
+
+   class UploadTextJobRequirementsUI <<presentation>> {
+
+    }
+
+    class UploadTextJobRequirementsController <<controller>> {
+
+    }
+    class JobOpeningManagementService <<service>> {
+
+    }
+    class AuthorizationService <<service>> {
+
+    }
+    class JobApplicationManagementService <<service>> {
+
+    }
+    class JobRequirementsManagementService <<service>> {
+
+    }
+
+    class JobOpeningRepository <<repository>> {
+
+    }
+    class JobApplicationRepository <<repository>> {
+
+    }
+
+
+
+
+UploadTextJobRequirementsUI ..> UploadTextJobRequirementsController
+UploadTextJobRequirementsController ..> JobOpeningManagementService : uses >
+UploadTextJobRequirementsController ..> AuthorizationService : uses >
+UploadTextJobRequirementsController ..> JobApplicationManagementService : uses >
+UploadTextJobRequirementsController ..> JobRequirementsManagementService : uses >
+
+JobOpeningManagementService ..> JobOpeningRepository : access >
+JobApplicationManagementService ..> JobApplicationRepository : access >
+
+@enduml

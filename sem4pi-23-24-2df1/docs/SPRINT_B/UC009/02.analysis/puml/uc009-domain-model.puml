@@ -1,0 +1,35 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+
+
+top to bottom direction
+left to right direction
+
+hide circle
+hide methods
+
+title Domain Model UC009
+
+package SystemUserAggregate {
+    class SystemUser <<Root Entity>>
+    class Name <<Value Object>>
+    class Email <<Value Object>>
+    class Password <<Value Object>>
+    enum Role <<Value Object>> {
+        ADMIN
+        CUSTOMER_MANAGER
+        OPERATOR
+        LANGUAGE_ENGINEER
+        CUSTOMER
+    }
+}
+SystemUser "1" -- "1" Name
+SystemUser "1" -- "1" Email
+SystemUser "1" -- "1" Password
+SystemUser "1" -- "*" Role
+@enduml

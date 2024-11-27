@@ -1,0 +1,147 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+autonumber 0
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC026
+
+actor CustomerManager as CM
+participant OpenClosePhasesJobOpeningUI as UI <<presentation>>
+participant OpenClosePhasesJobOpeningController as Controller <<application>>
+participant ": JobOpeningManagementService" as Service  <<service>>
+participant ": AuthorizationService" as AuthService <<service>>
+participant RepositoryFactory as Factory <<factory>>
+database JobOpeningRepository as Repository <<repository>>
+
+activate CM
+
+    CM --> UI: Select the option to open the job opening
+    activate UI
+
+    UI -> Controller: create()
+
+       activate Controller
+
+            UI -> Controller : obtainJobOpeningsAvailable()
+
+
+                Controller -> Service : findAllAvailable()
+
+           activate Service
+
+                  Service -> AuthService : ensureAuthenticatedUserHasAnyOf()
+
+                    activate AuthService
+
+                        AuthService --> Service : (in)success authentication
+
+                    deactivate AuthService
+
+                  Service -> Repository : findAll()
+
+                    activate Repository
+
+                        Repository --> Service : list of job openings
+
+                    deactivate Repository
+
+                  Service --> Controller : list of job openings
+
+           deactivate Service
+
+            Controller --> UI : list of job openings
+
+            UI -> Controller : filterJobOpenings(List<JobOpening> jobOpenings)
+
+            loop for each job opening
+
+                alt if jobOpening.phases.isEmpty()
+
+                    Controller -> Controller : addList(jobOpening)
+
+                end if
+            end
+
+            Controller --> UI : list of job openings
+
+       deactivate Controller
+
+    UI -> CM: show list of job openings.
+
+    deactivate UI
+
+
+        CM -> UI: Select the job opening to open
+
+    activate UI
+
+        UI --> CM: Display job opening phases
+    deactivate UI
+
+        CM -> UI: Select the phase to be open
+
+        activate UI
+
+                UI -> Controller: openPhases()
+
+                activate Controller
+
+                        loop phases of jobOpening
+
+                            alt if status != Status.PENDING
+
+                                    Controller -> Controller : allPending=false
+
+                            else if allPending=true && firstPhase == Phase.APPLICATION
+
+                                Controller -> Service : updatePhases(jobOpening, currentPhase, Status.COMPLETED)
+
+                                activate Service
+
+                                    Service -> Factory : repositories()
+
+                                        activate Factory
+
+                                            Factory --> Service : jobOpeningRepository
+
+                                        deactivate Factory
+
+                                        Service -> Repository : updatePhases(jobOpening, currentPhase, Status.COMPLETED)
+                                        activate Repository
+
+                                            Repository -> Repository : :OLD.phaseStatus := :NEW.phaseStatus
+                                        activate Repository
+                                            deactivate Repository
+
+                                        Repository --> Service : (in)success operation
+                                        deactivate Repository
+
+                                        Service --> Controller : (in)success operation
+
+                                deactivate Service
+
+                            end alt
+
+                        Controller --> UI : (in)success operation
+
+                deactivate Controller
+
+            UI -> CM: phase closed successfully
+
+        deactivate UI
+
+    alt if allPhases = Status.COMPLETED
+
+        UI --> CM: Job opening completed successfully
+
+    end
+
+            deactivate UI
+
+    deactivate CM
+
+
+@enduml

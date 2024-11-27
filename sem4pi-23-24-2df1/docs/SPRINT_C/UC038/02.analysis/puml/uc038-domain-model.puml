@@ -1,0 +1,41 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+hide circle
+hide methods
+
+title Domain Model (DM) - UC025
+
+package CandidateAggregate {
+    class Candidate <<root>>
+}
+
+package JobApplicationAggregate {
+    class JobApplication <<root>>
+
+    class JobApplicationReference <<value object>>
+
+    class JobApplicationStatus <<value object>>
+}
+
+package JobOpeningAggregate {
+    class JobOpening <<root>>
+
+    class JobReference <<value object>>
+
+    class JobOpeningStatus <<value object>>
+}
+
+Candidate --> JobApplication : submits >
+
+JobApplication --> JobApplicationStatus : has >
+JobApplication --> JobApplicationReference : identified by >
+JobApplication --> JobOpening : to >
+
+JobOpening --> JobReference : identified by >
+JobOpening --> JobOpeningStatus : has >
+
+@enduml

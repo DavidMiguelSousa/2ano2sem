@@ -1,0 +1,78 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC016
+actor CustomerManager as CM
+
+activate CM
+
+    CM -> ":System" : wants to setup the phases for a job opening
+
+    activate ":System"
+    
+        ":System" --> CM: show list of job openings.
+
+    deactivate ":System"
+
+        CM -> ":System" : select a job opening.
+
+    activate ":System"
+
+        ":System" --> CM: show phases of the process
+
+    deactivate ":System"
+
+        ":System" --> CM: request date for Application's phase
+
+    activate ":System"
+
+        CM -> ":System" : enters dates
+
+    deactivate ":System"
+
+        ":System" --> CM: request date for Screening's phase
+
+    activate ":System"
+
+        CM -> ":System" : enters dates
+
+    deactivate ":System"
+
+        ":System" --> CM: request date for Interview's phase
+
+    activate ":System"
+
+        alt exists Interview
+
+        CM -> ":System" : enters dates
+
+        else not exists Interview
+
+        CM -> ":System" : skips to next phase
+
+        end
+
+    activate ":System"
+
+         ":System" --> CM: request date for Analysis' phase
+
+    deactivate ":System"
+
+        CM -> ":System" : enters dates
+
+    activate ":System"
+
+        ":System" --> CM: request date for Result's phase
+
+    deactivate ":System"
+
+        CM -> ":System" : enters dates
+
+    activate ":System"
+
+        ":System" --> CM: shows (in)sucess message
+    deactivate ":System"
+
+@enduml

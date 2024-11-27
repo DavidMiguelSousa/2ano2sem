@@ -1,0 +1,7 @@
+INTERVIEW "C Programmer"
+
+TFQUES "Is C good?" [10];
+SOL <TRUE|1>;
+
+SAQUES "Spell C." [10];
+SOL <C|1>;

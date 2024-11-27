@@ -1,0 +1,37 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC002
+actor Admin as Admin
+participant ":System" as System
+
+activate Admin
+    Admin -> System: Login
+    activate System
+
+        System -> System: Validate login
+
+        System --> Admin: Allow access to the backoffice application with admin permissions
+    deactivate System
+
+    Admin -> System: Select the option to enabled the user
+    activate System
+
+        System --> Admin: Display all inactive system users
+    deactivate System
+
+    Admin -> System: Select the user to be enabled
+    activate System
+
+        System -> System: Enable user
+        alt User is enabled
+            System --> Admin: User enabled successfully
+        else User is not enabled
+            System --> Admin: User not enabled
+        end
+    deactivate System
+deactivate Admin
+
+@enduml

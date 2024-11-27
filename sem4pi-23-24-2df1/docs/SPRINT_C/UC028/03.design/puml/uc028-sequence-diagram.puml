@@ -1,0 +1,133 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+
+skinparam classAttributeIconSize 0
+
+title Sequence Diagram (SD) - UC028
+
+Actor "Customer Manager" as Actor
+participant RecordInterviewTimestampUI as UI <<presentation>>
+participant RecordInterviewTimestampController as Controller <<application>>
+participant AuthorizationService as Authz <<service>>
+participant UserSession as Session <<Session>>
+participant JobOpeningManagementService as Service <<service>>
+participant JobApplicationManagementService as Service1 <<service>>
+participant PersistenceContext as Persistence <<persistence>>
+participant RepositoryFactory as Factory <<factory>>
+database JobOpeningRepository as Repository <<repository>>
+database JobApplicationRepository as Repository1 <<repository>>
+
+Actor -> UI: Record time and date for an interview with a candidate
+activate UI
+
+    UI -> Controller: create()
+
+    UI -> Controller: jobOpenings()
+    activate Controller
+
+    Controller -> Authz: create()
+
+    Controller -> Authz: ensureAuthenticatedUserHasAnyOf(BaseRoles.CUSTOMER_MANAGER)
+    activate Authz
+
+    Authz -> Session: create()
+
+    Controller -> Authz : session()
+
+    Authz -> Controller : session
+    deactivate Authz
+
+    Controller -> Session : authenticatedUser()
+    activate Session
+
+    Session -> Controller : user
+    deactivate Session
+
+    Controller -> Service: create()
+
+    Controller -> Service: findAll()
+    activate Service
+
+    Service -> Persistence: repositories()
+    activate Persistence
+
+    Persistence -> Factory: create()
+
+    Persistence -> Service: factory
+    deactivate Persistence
+
+    Service -> Factory: jobOpenings()
+    activate Factory
+
+    Factory -> Repository: create()
+
+    Factory -> Service: jobOpeningRepository
+    deactivate Factory
+
+    Service -> Repository: findAllActive()
+    activate Repository
+
+    Repository -> Service: jobOpenings
+    deactivate Repository
+
+    Service -> Controller: jobOpenings
+    deactivate Service
+
+    Controller -> UI: jobOpenings
+    deactivate Controller
+
+    UI -> Actor: Show Job Opening list
+
+    Actor -> UI: Choose job opening
+
+    UI -> Controller: jobApplicationsByJobOpening(jobOpening)
+    activate Controller
+
+    Controller -> Service1: create()
+    activate Service1
+
+    Service1 -> Repository1: findJobApplicationsByJobOpening(jobOpening)
+    activate Repository1
+
+    Repository1 -> Service1: jobApplications
+    deactivate Repository1
+
+    Service1 -> Controller: jobApplications
+    deactivate Service1
+
+    Controller -> UI: jobApplications
+    deactivate Controller
+
+    UI -> Actor: Show job applications for the selected job opening
+
+    Actor -> UI: Choose job application
+
+    UI -> Actor: Ask for timestamp for the interview
+
+    Actor -> UI: Input timestamp
+
+    UI -> Controller: recordInterviewTimestamp(jobApplication, timestamp)
+    activate Controller
+
+    Controller -> Service1: recordInterviewTimestamp(jobApplication, timestamp)
+    activate Service1
+
+    Service1 -> Repository1: update(jobApplication)
+    activate Repository1
+
+    Repository1 -> Service1: jobApplication
+    deactivate Repository1
+
+    Service1 -> Controller: jobApplication
+    deactivate Service1
+
+    Controller -> UI: jobApplication
+    deactivate Controller
+
+    UI -> Actor: (un)success of the operation
+
+deactivate UI
+
+@enduml

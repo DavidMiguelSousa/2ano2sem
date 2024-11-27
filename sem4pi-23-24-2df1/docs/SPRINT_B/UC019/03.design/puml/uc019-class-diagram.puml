@@ -1,0 +1,43 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC019
+
+class SelectInterviewModelUI <<interface>>
+
+class SelectInterviewModelController <<controller>>
+
+class JobOpeningManagementService <<service>>
+
+class ListInterviewModelService <<service>>
+
+class InterviewModelRepository <<repository>>
+
+class JobOpeningRepository <<repository>>
+
+class RepositoryFactory <<factory>>
+
+class JobOpening <<entity>>
+
+class InterviewModel <<entity>>
+
+SelectInterviewModelUI ..> SelectInterviewModelController
+
+SelectInterviewModelController ..> JobOpeningManagementService : uses >
+SelectInterviewModelController ..> ListInterviewModelService : uses >
+
+SelectInterviewModelController ..> InterviewModelRepository : accesses >
+SelectInterviewModelController ..> JobOpeningRepository : accesses >
+
+RepositoryFactory .up.> InterviewModelRepository
+RepositoryFactory .up.> JobOpeningRepository
+
+JobOpeningRepository ..> JobOpening : saves in database >
+
+InterviewModelRepository ..> InterviewModel : saves in database >
+
+
+@enduml

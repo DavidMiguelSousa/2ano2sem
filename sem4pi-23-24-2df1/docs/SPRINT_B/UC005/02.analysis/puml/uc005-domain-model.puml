@@ -1,0 +1,37 @@
+@startuml
+skinparam monochrome false
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+left to right direction
+top to bottom direction
+
+hide circle
+hide methods
+
+title Domain Model - UC005
+
+class SystemUser{}
+
+class Name{
+}
+
+class Email{
+}
+
+class Password{
+}
+
+class CustomerManager {}
+
+class Customer {}
+
+CustomerManager "1" -- "*" Customer: creates >
+Customer " 1" --> "1" SystemUser: is a >
+CustomerManager "1 " --> "1" SystemUser: is a >
+SystemUser "1" -- "1" Name
+SystemUser "1" -- "1" Email
+SystemUser "1" -- "1" Password
+@enduml

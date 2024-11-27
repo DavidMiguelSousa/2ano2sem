@@ -1,0 +1,96 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC023
+
+
+    class EditJobOpeningUI <<presentation>> {
+        editJobOpening()
+        jobOpenings()
+        changeJobTitleTo()
+        changeContractTypeTo()
+        changeJobModeTo()
+        changeJobDescriptionTo()
+        changeAddressTo()
+        changeNumberOfVacanciesTo()
+        changeApprovalStatusTo()
+    }
+
+
+
+    class EditJobOpeningController <<application>> {
+        activeJobOpenings()
+        changeJobTitleTo()
+        changeContractTypeTo()
+        changeJobModeTo()
+        changeJobDescriptionTo()
+        changeAddressTo()
+        changeNumberOfVacanciesTo()
+        changeApprovalStatusTo()
+    }
+
+
+
+    class AuthorizationService <<service>> {
+        ensureAuthenticatedUserHasAnyOf(role: BaseRoles)
+        session()
+    }
+
+    class JobOpeningManagementService <<service>> {
+        findAll()
+        jobOpenings()
+    }
+
+
+    class UserSession <<Session>> {
+        authenticatedUser()
+    }
+
+
+
+    class JobOpening <<domain>> {
+        updateJobTitle()
+        updateContractType()
+        updateJobMode()
+        updateJobDescription()
+        updateAddress()
+        updateNumberOfVacancies()
+        updateApprovalStatus()
+    }
+
+
+
+    class PersistenceContext <<persistence>> {
+        repositories()
+        factory()
+    }
+
+
+    class RepositoryFactory <<factory>> {
+        jobOpenings()
+    }
+
+
+
+    class JobOpeningRepository <<repository>> {
+        findAllActive()
+        save(theJobOpening: JobOpening)
+    }
+
+
+EditJobOpeningUI --> EditJobOpeningController: controller
+EditJobOpeningController --> AuthorizationService: authz
+EditJobOpeningController --> UserSession: session
+EditJobOpeningController --> JobOpeningManagementService: service
+AuthorizationService --> UserSession: session
+JobOpeningManagementService --> PersistenceContext: persistence
+PersistenceContext --> RepositoryFactory: factory
+RepositoryFactory --> JobOpeningRepository: repository
+JobOpeningManagementService --> JobOpeningRepository: repository
+EditJobOpeningController --> JobOpening: domain
+
+
+@enduml

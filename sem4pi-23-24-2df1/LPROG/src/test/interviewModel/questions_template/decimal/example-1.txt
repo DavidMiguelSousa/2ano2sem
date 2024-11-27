@@ -1,0 +1,4 @@
+INTERVIEW "Decimal example-1"
+
+DECQUES [Decimal] "Write the first 3 digits of pi." [10];
+SOL <3.14|1>;

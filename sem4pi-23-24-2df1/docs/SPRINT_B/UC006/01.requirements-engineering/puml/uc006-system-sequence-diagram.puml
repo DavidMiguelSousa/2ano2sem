@@ -1,0 +1,74 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC006
+actor CustomerManager as CM
+
+activate CM
+CM -> ":System" : asks to register a job opening.
+
+activate ":System"
+":System" -> CM : requests Title or function
+deactivate ":System"
+
+CM-> ":System" : provides Title or function
+
+
+activate ":System"
+":System" -> CM : requests Address
+deactivate ":System"
+
+CM-> ":System" : provides Address
+
+
+activate ":System"
+":System" -> CM : display customer
+deactivate ":System"
+
+CM-> ":System" : select customer
+
+
+activate ":System"
+":System" -> CM : requests Number of vacancies
+deactivate ":System"
+
+CM-> ":System" : provides Number of vacancies
+
+
+activate ":System"
+":System" -> CM : requests Description
+deactivate ":System"
+
+CM-> ":System" : provides Description
+
+
+activate ":System"
+":System" -> CM : display Contract Types (full-time, part-time)
+deactivate ":System"
+
+CM-> ":System" : select Contract Type
+
+
+activate ":System"
+":System" -> CM : display Modes (remote, hybrid, onsite)
+deactivate ":System"
+
+CM-> ":System" : select Mode
+
+
+activate ":System"
+
+
+
+":System" -> ":System" : create Job Opening (Function, Address, Company, Number of vacancies, Description, Job Reference, Contract Type, Mode)
+
+
+":System" -> CM: Operation Successful
+deactivate ":System"
+deactivate ":System"
+
+deactivate CM
+
+@enduml

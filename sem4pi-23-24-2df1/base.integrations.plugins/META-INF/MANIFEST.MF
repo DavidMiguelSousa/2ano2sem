@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: eapli.base.integrations.plugins.importers.ImportInterviewMod
+ elsAndJobRequirements
+

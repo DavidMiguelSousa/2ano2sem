@@ -1,0 +1,55 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+actor "CustomerManager" as CM
+participant ": ListJobOpeningsUI" as ListJobOpeningUI <<presentation>>
+participant ": ListJobOpeningController" as Controller <<application>>
+participant JobOpeningManagementService as Service <<service>>
+
+
+database JobOpeningRepository as JobOpeningRepository <<repository>>
+
+
+
+
+
+activate CM
+   CM -> ListJobOpeningUI : asks to  list job openings.
+activate ListJobOpeningUI
+
+
+
+
+ListJobOpeningUI -> Controller : allJobOpenings()
+
+        activate Controller
+activate Service
+                Controller -> Service : allJobOpenings()
+    Service -> JobOpeningRepository : allJobOpenings()
+                activate JobOpeningRepository
+
+                JobOpeningRepository --> JobOpeningRepository : select(JobOpenings)
+
+                JobOpeningRepository --> Service : JobOpenings
+Service -> Controller : JobOpenings
+                deactivate JobOpeningRepository
+deactivate Service
+                Controller --> ListJobOpeningUI : JobOpenings
+
+        deactivate Controller
+
+
+
+
+
+ListJobOpeningUI -> CM : shows list
+
+
+deactivate CM
+
+@enduml

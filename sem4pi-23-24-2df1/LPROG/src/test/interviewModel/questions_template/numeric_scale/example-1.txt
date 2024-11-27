@@ -1,0 +1,4 @@
+INTERVIEW "Numeric Scale example-1"
+
+NSQUES [1-5] "How much do you love ISEP?" [10];
+SOL <5|1>;

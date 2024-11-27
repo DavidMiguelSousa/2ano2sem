@@ -1,0 +1,33 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title System Sequence Diagram (SSD) - UC013
+actor CustomerManager as CM
+
+
+activate CM
+
+    CM -> ":System" : ask to list all applications for a job opening.
+
+    activate ":System"
+
+
+            ":System" -> CM: display Job Opening
+            deactivate ":System"
+
+            CM -> ":System" : select a job opening
+activate ":System"
+
+             alt successful case
+
+            ":System" -> CM: display all applications for the selected job opening.
+            else failure case
+            ":System" -> CM: show message "No applications found."
+
+        end
+    deactivate ":System"
+
+deactivate CM
+@enduml

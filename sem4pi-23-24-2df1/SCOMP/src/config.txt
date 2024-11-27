@@ -1,0 +1,5 @@
+input_directory=../files/emailBotFiles
+output_directory=../files/fileBotFiles
+files_db=../files/files-db.txt
+number_of_workers=5
+check_interval=10

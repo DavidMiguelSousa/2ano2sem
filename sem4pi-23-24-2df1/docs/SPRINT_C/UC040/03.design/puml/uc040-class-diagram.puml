@@ -1,0 +1,53 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+skinparam classAttributeIconSize 0
+
+title Class Diagram (CD) - UC038
+
+class ListCustomerJobOpeningsUI <<presentation>>
+
+class ListCustomerJobOpeningsController <<controller>>
+
+class TcpService <<service>>
+
+class TcpChatCli <<service>>
+
+class TcpChatSrv <<service>>
+
+class RepositoryFactory <<factory>>
+
+class JobApplication <<root entity>>
+
+
+class JobOpeningRepository <<repository>>
+
+class JobOpening <<root entity>>
+
+class JobReference <<value object>>
+
+class CustomerRepository <<repository>>
+
+class Customer <<root entity>>
+
+ListCustomerJobOpeningsUI ..> ListCustomerJobOpeningsController
+
+ListCustomerJobOpeningsController ..> TcpService : uses >
+
+TcpService ..> CustomerRepository : accesses >
+TcpService ..> JobOpeningRepository : accesses >
+
+JobOpeningRepository <.. RepositoryFactory : creates <
+JobOpeningRepository ...> JobOpening : saves in database >
+
+TcpService --> TcpChatCli : connects >
+TcpService --> TcpChatSrv : connects >
+
+CustomerRepository <.. RepositoryFactory : creates <
+CustomerRepository ...> Customer : saves in database >
+
+JobOpening --> Customer : submits <
+
+JobOpening --> JobReference : identified by >
+@enduml
